@@ -1,3 +1,14 @@
+#if (ARDUINO >= 100)
+ #include <Arduino.h>
+#else
+ #include <WProgram.h>
+ #include <pins_arduino.h>
+#endif
+
+#include "pins_arduino.h"
+#include "wiring_private.h"
+#include <SPI.h> 
+
 #define VS1053_SCI_READ 0x03
 #define VS1053_SCI_WRITE 0x02
 
@@ -20,3 +31,21 @@
 #define VS1053_MODE_SM_EARSPKLO 0x0010
 #define VS1053_MODE_SM_TESTS 0x0020
 #define VS1053_MODE_SM_STREAM 0x0040
+
+
+class Adafruit_MP3 {
+ public:
+  Adafruit_MP3(uint8_t mosi, uint8_t miso, uint8_t clk, 
+	       uint8_t rst, uint8_t cs, uint8_t dcs, uint8_t dreq);
+  uint8_t begin(void);
+  void reset(void);
+  void dumpRegs(void);
+  uint16_t sci_read(uint8_t addr);
+  void sci_write(uint8_t addr, uint16_t data);
+  void sineTest(uint8_t n, uint16_t ms);
+
+ private:
+  uint8_t _mosi, _miso, _clk, _reset, _cs, _dcs, _dreq;
+  void spiwrite(uint8_t d);
+  uint8_t spiread(void);
+};
