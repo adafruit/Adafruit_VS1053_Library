@@ -14,17 +14,21 @@ Adafruit_MP3::Adafruit_MP3(uint8_t mosi, uint8_t miso, uint8_t clk,
   _dreq = dreq;
 
 
-  pinMode(_reset, OUTPUT);
-  digitalWrite(_reset, LOW);
-  pinMode(_cs, OUTPUT);
-  digitalWrite(_cs, HIGH);
-  pinMode(_dcs, OUTPUT);
-  digitalWrite(_dcs, HIGH);
-
-  reset();
+  clkportreg = portOutputRegister(digitalPinToPort(_clk));
+  clkpin = digitalPinToBitMask(_clk);
+  misoportreg = portInputRegister(digitalPinToPort(_miso));
+  misopin = digitalPinToBitMask(_miso);
+  mosiportreg = portOutputRegister(digitalPinToPort(_mosi));
+  mosipin = digitalPinToBitMask(_mosi);
 }
 
+uint16_t Adafruit_MP3::decodeTime() {
+  return sci_read(VS1053_REG_DECODETIME);
+}
+
+
 void Adafruit_MP3::reset() {
+  // TODO: http://www.vlsi.fi/player_vs1011_1002_1003/modularplayer/vs10xx_8c.html#a3
   // hardware reset
   digitalWrite(_reset, LOW);
   delay(100);
@@ -32,25 +36,24 @@ void Adafruit_MP3::reset() {
   digitalWrite(_dcs, HIGH);
   digitalWrite(_reset, HIGH);
   delay(100);
+
+  sci_write(VS1053_REG_CLOCKF, 0x6000);
 }
 
 uint8_t Adafruit_MP3::begin(void) {
-  pinMode(_mosi, OUTPUT);
-  pinMode(_clk, OUTPUT);
-  pinMode(_miso, INPUT);
+
+  pinMode(_reset, OUTPUT);
+  digitalWrite(_reset, LOW);
   pinMode(_cs, OUTPUT);
   digitalWrite(_cs, HIGH);
   pinMode(_dcs, OUTPUT);
   digitalWrite(_dcs, HIGH);
+  pinMode(_mosi, OUTPUT);
+  pinMode(_clk, OUTPUT);
+  pinMode(_miso, INPUT);
+  pinMode(_dreq, INPUT);
 
-  clkportreg = portOutputRegister(digitalPinToPort(_clk));
-  clkpin = digitalPinToBitMask(_clk);
-  misoportreg = portInputRegister(digitalPinToPort(_miso));
-  misopin = digitalPinToBitMask(_miso);
-  mosiportreg = portOutputRegister(digitalPinToPort(_mosi));
-  mosipin = digitalPinToBitMask(_mosi);
-
-  sci_write(VS1053_REG_CLOCKF, 0x6000);
+  reset();
 
   return (sci_read(VS1053_REG_STATUS) >> 4) & 0x0F;
 }
@@ -135,10 +138,11 @@ void Adafruit_MP3::sineTest(uint8_t n, uint16_t ms) {
   reset();
   
   uint16_t mode = sci_read(VS1053_REG_MODE);
-  mode |= 0x0020
+  mode |= 0x0020;
   sci_write(VS1053_REG_MODE, mode);
 
-  delay(10);
+  while (!digitalRead(_dreq));
+	 //  delay(10);
 
   digitalWrite(_dcs, LOW);  
   spiwrite(0x53);
@@ -151,7 +155,16 @@ void Adafruit_MP3::sineTest(uint8_t n, uint16_t ms) {
   spiwrite(0x00);
   digitalWrite(_dcs, HIGH);  
   
-  delay_ms(ms);
+  delay(ms);
 
-
+  digitalWrite(_dcs, LOW);  
+  spiwrite(0x45);
+  spiwrite(0x78);
+  spiwrite(0x69);
+  spiwrite(0x74);
+  spiwrite(0x00);
+  spiwrite(0x00);
+  spiwrite(0x00);
+  spiwrite(0x00);
+  digitalWrite(_dcs, HIGH);  
 }

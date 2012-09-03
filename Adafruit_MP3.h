@@ -43,9 +43,12 @@ class Adafruit_MP3 {
   uint16_t sci_read(uint8_t addr);
   void sci_write(uint8_t addr, uint16_t data);
   void sineTest(uint8_t n, uint16_t ms);
+  void spiwrite(uint8_t d);
+  uint8_t spiread(void);
+  uint16_t decodeTime();
 
  private:
   uint8_t _mosi, _miso, _clk, _reset, _cs, _dcs, _dreq;
-  void spiwrite(uint8_t d);
-  uint8_t spiread(void);
+
+
 };
