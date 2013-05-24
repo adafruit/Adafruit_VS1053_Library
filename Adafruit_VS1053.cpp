@@ -239,7 +239,7 @@ uint16_t Adafruit_VS1053::loadPlugin(char *plugname) {
     uint16_t offsets[] = {0x8000UL, 0x0, 0x4000UL};
     uint16_t addr, len;
 
-    Serial.print("type: "); Serial.println(type, HEX);
+    //Serial.print("type: "); Serial.println(type, HEX);
 
     if (type >= 4) {
         plugin.close();
@@ -250,8 +250,8 @@ uint16_t Adafruit_VS1053::loadPlugin(char *plugname) {
     len |= plugin.read() & ~1;
     addr = plugin.read();    addr <<= 8;
     addr |= plugin.read();
-    Serial.print("len: "); Serial.print(len); 
-    Serial.print(" addr: $"); Serial.println(addr, HEX);
+    //Serial.print("len: "); Serial.print(len); 
+    //Serial.print(" addr: $"); Serial.println(addr, HEX);
 
     if (type == 3) {
       // execute rec!
@@ -361,16 +361,17 @@ void Adafruit_VS1053::dumpRegs(void) {
   Serial.print("Vol. = 0x"); Serial.println(sciRead(VS1053_REG_VOLUME), HEX);
 }
 
-boolean Adafruit_VS1053::stopRecordOgg(void) {
-  sciWrite(VS1053_SCI_AICTRL3, 1);
 
-  // check remaining words!
-
-  // if actually done,
-  return true;
+uint16_t Adafruit_VS1053::recordedWordsWaiting(void) {
+  return sciRead(VS1053_REG_HDAT1);
 }
 
-boolean Adafruit_VS1053::startRecordOgg(char *plugname) {
+uint16_t Adafruit_VS1053::recordedReadWord(void) {
+  return sciRead(VS1053_REG_HDAT0);
+}
+
+
+boolean Adafruit_VS1053::prepareRecordOgg(char *plugname) {
   sciWrite(VS1053_REG_CLOCKF, 0xC000);  // set max clock
   delay(1);    while (! readyForData() );
 
@@ -389,12 +390,23 @@ boolean Adafruit_VS1053::startRecordOgg(char *plugname) {
   Serial.print("Plugin at $"); Serial.println(pluginStartAddr, HEX);
   if (pluginStartAddr != 0x34) return false;
 
+  return true;
+}
+
+void Adafruit_VS1053::stopRecordOgg(void) {
+  sciWrite(VS1053_SCI_AICTRL3, 1);
+}
+
+void Adafruit_VS1053::startRecordOgg(boolean mic) {
   /* Set VS1053 mode bits as instructed in the VS1053b Ogg Vorbis Encoder
      manual. Note: for microphone input, leave SMF_LINE1 unset! */
-  sciWrite(VS1053_REG_MODE, VS1053_MODE_SM_LINE1 | 
-	   VS1053_MODE_SM_ADPCM | VS1053_MODE_SM_SDINEW);
-
-  sciWrite(VS1053_SCI_AICTRL0, 0);
+  if (mic) {
+    sciWrite(VS1053_REG_MODE, VS1053_MODE_SM_ADPCM | VS1053_MODE_SM_SDINEW);
+  } else {
+    sciWrite(VS1053_REG_MODE, VS1053_MODE_SM_LINE1 | 
+	     VS1053_MODE_SM_ADPCM | VS1053_MODE_SM_SDINEW);
+  }
+  sciWrite(VS1053_SCI_AICTRL0, 1024);
   /* Rec level: 1024 = 1. If 0, use AGC */
   sciWrite(VS1053_SCI_AICTRL1, 1024);
   /* Maximum AGC level: 1024 = 1. Only used if SCI_AICTRL1 is set to 0. */
@@ -402,10 +414,8 @@ boolean Adafruit_VS1053::startRecordOgg(char *plugname) {
   /* Miscellaneous bits that also must be set before recording. */
   sciWrite(VS1053_SCI_AICTRL3, 0);
   
-  sciWrite(VS1053_SCI_AIADDR, pluginStartAddr);
+  sciWrite(VS1053_SCI_AIADDR, 0x34);
   delay(1);    while (! readyForData() );
-  
-  return true;
 }
 
 void Adafruit_VS1053::GPIO_pinMode(uint8_t i, uint8_t dir) {

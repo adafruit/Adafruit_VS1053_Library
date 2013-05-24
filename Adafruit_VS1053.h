@@ -84,9 +84,12 @@ class Adafruit_VS1053 {
   uint16_t GPIO_digitalRead(void);
   boolean GPIO_digitalRead(uint8_t i);
   void GPIO_pinMode(uint8_t i, uint8_t dir);
-
-  boolean startRecordOgg(char *plugin);
-  boolean stopRecordOgg(void);
+ 
+  boolean prepareRecordOgg(char *plugin);
+  void startRecordOgg(boolean mic);
+  void stopRecordOgg(void);
+  uint16_t recordedWordsWaiting(void);
+  uint16_t recordedReadWord(void);
 
   uint8_t mp3buffer[VS1053_DATABUFFERLEN];
 
