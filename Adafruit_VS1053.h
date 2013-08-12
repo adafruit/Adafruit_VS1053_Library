@@ -25,7 +25,7 @@
 #include <SPI.h> 
 #include <SD.h>
 
-#define VS1053_FILEPLAYER_TIMER0_INT 0
+#define VS1053_FILEPLAYER_TIMER0_INT 255 // allows useInterrupt to accept pins 0 to 254
 #define VS1053_FILEPLAYER_PIN_INT 5
 
 #define VS1053_SCI_READ 0x03
