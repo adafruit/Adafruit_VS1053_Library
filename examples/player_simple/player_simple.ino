@@ -45,8 +45,12 @@ void setup() {
   // Set volume for left, right channels. lower numbers == louder volume!
   musicPlayer.setVolume(20,20);
 
-  musicPlayer.useInterrupt(VS1053_FILEPLAYER_TIMER0_INT); // timer int
-  //musicPlayer.useInterrupt(VS1053_FILEPLAYER_PIN_INT);  // DREQ int
+  // Timer interrupts are not suggested, better to use DREQ interrupt!
+  //musicPlayer.useInterrupt(VS1053_FILEPLAYER_TIMER0_INT); // timer int
+
+  // If DREQ is on an interrupt pin (on uno, #2 or #3) we can do background
+  // audio playing
+  musicPlayer.useInterrupt(VS1053_FILEPLAYER_PIN_INT);  // DREQ int
   
   // Play one file, don't return until complete
   musicPlayer.playFullFile("track001.mp3");
@@ -56,8 +60,29 @@ void setup() {
 
 void loop() {
   // File is playing in the background
-  if (! musicPlayer.playingMusic) 
+  if (musicPlayer.stopped()) {
     Serial.println("Done playing music");
-  
-  delay(1000);
+    while (1);
+  }
+  if (Serial.available()) {
+    char c = Serial.read();
+    
+    // if we get an 's' on the serial console, stop!
+    if (c == 's') {
+      musicPlayer.stopPlaying();
+    }
+    
+    // if we get an 'p' on the serial console, pause/unpause!
+    if (c == 'p') {
+      if (! musicPlayer.paused()) {
+        Serial.println("Paused");
+        musicPlayer.pausePlaying(true);
+      } else { 
+        Serial.println("Resumed");
+        musicPlayer.pausePlaying(false);
+      }
+    }
+  }
+
+  delay(100);
 }

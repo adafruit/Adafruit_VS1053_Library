@@ -147,6 +147,30 @@ boolean Adafruit_VS1053_FilePlayer::playFullFile(char *trackname) {
   return true;
 }
 
+void Adafruit_VS1053_FilePlayer::stopPlaying(void) {
+  // wrap it up!
+  playingMusic = false;
+  currentTrack.close();
+}
+
+void Adafruit_VS1053_FilePlayer::pausePlaying(boolean pause) {
+  if (pause) 
+    playingMusic = false;
+  else {
+    playingMusic = true;
+    feedBuffer();
+  }
+}
+
+boolean Adafruit_VS1053_FilePlayer::paused(void) {
+  return (!playingMusic && currentTrack);
+}
+
+boolean Adafruit_VS1053_FilePlayer::stopped(void) {
+  return (!playingMusic && !currentTrack);
+}
+
+
 boolean Adafruit_VS1053_FilePlayer::startPlayingFile(char *trackname) {
   currentTrack = SD.open(trackname);
   if (!currentTrack) {
@@ -158,16 +182,20 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(char *trackname) {
   // wait till its ready for data
   while (! readyForData() );
   
-  Serial.println("Ready");
 
   // fill it up!
   while (readyForData()) 
     feedBuffer();
+
+//  Serial.println("Ready");
   
   return true;
 }
 
 void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
+  if (! playingMusic) {
+    return; // paused or stopped
+  }
   if (! currentTrack) {
     return;
   }
