@@ -100,7 +100,7 @@ void midiNoteOn(uint8_t chan, uint8_t n, uint8_t vel) {
   if (n > 127) return;
   if (vel > 127) return;
   
-  VS1053_MIDI.write(MIDI_NOTE_ON);
+  VS1053_MIDI.write(MIDI_NOTE_ON | chan);
   VS1053_MIDI.write(n);
   VS1053_MIDI.write(vel);
 }
