@@ -73,9 +73,9 @@
 
 class Adafruit_VS1053 {
  public:
-  Adafruit_VS1053(uint8_t mosi, uint8_t miso, uint8_t clk, 
-		  uint8_t rst, uint8_t cs, uint8_t dcs, uint8_t dreq);
-  Adafruit_VS1053(uint8_t rst, uint8_t cs, uint8_t dcs, uint8_t dreq);
+  Adafruit_VS1053(int8_t mosi, int8_t miso, int8_t clk, 
+		  int8_t rst, int8_t cs, int8_t dcs, int8_t dreq);
+  Adafruit_VS1053(int8_t rst, int8_t cs, int8_t dcs, int8_t dreq);
   uint8_t begin(void);
   void reset(void);
   void softReset(void);
@@ -111,18 +111,18 @@ class Adafruit_VS1053 {
  protected:
   uint8_t  _dreq;
  private:
-  uint8_t _mosi, _miso, _clk, _reset, _cs, _dcs;
+  int8_t _mosi, _miso, _clk, _reset, _cs, _dcs;
   boolean useHardwareSPI;
 };
 
 
 class Adafruit_VS1053_FilePlayer : public Adafruit_VS1053 {
  public:
-  Adafruit_VS1053_FilePlayer (uint8_t mosi, uint8_t miso, uint8_t clk, 
-			      uint8_t rst, uint8_t cs, uint8_t dcs, uint8_t dreq,
-			      uint8_t cardCS);
-  Adafruit_VS1053_FilePlayer (uint8_t rst, uint8_t cs, uint8_t dcs, uint8_t dreq,
-			      uint8_t cardCS);
+  Adafruit_VS1053_FilePlayer (int8_t mosi, int8_t miso, int8_t clk, 
+			      int8_t rst, int8_t cs, int8_t dcs, int8_t dreq,
+			      int8_t cardCS);
+  Adafruit_VS1053_FilePlayer (int8_t rst, int8_t cs, int8_t dcs, int8_t dreq,
+			      int8_t cardCS);
 
   boolean begin(void);
   boolean useInterrupt(uint8_t type);

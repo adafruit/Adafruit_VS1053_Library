@@ -99,8 +99,8 @@ boolean Adafruit_VS1053_FilePlayer::useInterrupt(uint8_t type) {
 }
 
 Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(
-	       uint8_t rst, uint8_t cs, uint8_t dcs, uint8_t dreq, 
-	       uint8_t cardcs) 
+	       int8_t rst, int8_t cs, int8_t dcs, int8_t dreq, 
+	       int8_t cardcs) 
                : Adafruit_VS1053(rst, cs, dcs, dreq) {
 
   playingMusic = false;
@@ -112,9 +112,9 @@ Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(
 
 
 Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(
-               uint8_t mosi, uint8_t miso, uint8_t clk, 
-	       uint8_t rst, uint8_t cs, uint8_t dcs, uint8_t dreq, 
-	       uint8_t cardcs) 
+               int8_t mosi, int8_t miso, int8_t clk, 
+	       int8_t rst, int8_t cs, int8_t dcs, int8_t dreq, 
+	       int8_t cardcs) 
                : Adafruit_VS1053(mosi, miso, clk, rst, cs, dcs, dreq) {
 
   playingMusic = false;
@@ -228,8 +228,8 @@ void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
 static volatile uint8_t *clkportreg, *misoportreg, *mosiportreg;
 static uint8_t clkpin, misopin, mosipin;
 
-Adafruit_VS1053::Adafruit_VS1053(uint8_t mosi, uint8_t miso, uint8_t clk, 
-			   uint8_t rst, uint8_t cs, uint8_t dcs, uint8_t dreq) {
+Adafruit_VS1053::Adafruit_VS1053(int8_t mosi, int8_t miso, int8_t clk, 
+			   int8_t rst, int8_t cs, int8_t dcs, int8_t dreq) {
   _mosi = mosi;
   _miso = miso;
   _clk = clk;
@@ -249,7 +249,7 @@ Adafruit_VS1053::Adafruit_VS1053(uint8_t mosi, uint8_t miso, uint8_t clk,
 }
 
 
-Adafruit_VS1053::Adafruit_VS1053(uint8_t rst, uint8_t cs, uint8_t dcs, uint8_t dreq) {
+Adafruit_VS1053::Adafruit_VS1053(int8_t rst, int8_t cs, int8_t dcs, int8_t dreq) {
   _mosi = 0;
   _miso = 0;
   _clk = 0;
@@ -389,11 +389,15 @@ void Adafruit_VS1053::softReset(void) {
 void Adafruit_VS1053::reset() {
   // TODO: http://www.vlsi.fi/player_vs1011_1002_1003/modularplayer/vs10xx_8c.html#a3
   // hardware reset
-  digitalWrite(_reset, LOW);
-  delay(100);
+  if (_reset >= 0) {
+    digitalWrite(_reset, LOW);
+    delay(100);
+    digitalWrite(_reset, HIGH);
+  }
   digitalWrite(_cs, HIGH);
   digitalWrite(_dcs, HIGH);
-  digitalWrite(_reset, HIGH);
+  delay(100);
+  softReset();
   delay(100);
 
   sciWrite(VS1053_REG_CLOCKF, 0x6000);
@@ -402,9 +406,11 @@ void Adafruit_VS1053::reset() {
 }
 
 uint8_t Adafruit_VS1053::begin(void) {
+  if (_reset >= 0) {
+    pinMode(_reset, OUTPUT);
+    digitalWrite(_reset, LOW);
+  }
 
-  pinMode(_reset, OUTPUT);
-  digitalWrite(_reset, LOW);
   pinMode(_cs, OUTPUT);
   digitalWrite(_cs, HIGH);
   pinMode(_dcs, OUTPUT);
