@@ -127,12 +127,9 @@ Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(
 boolean Adafruit_VS1053_FilePlayer::begin(void) {
   uint8_t v  = Adafruit_VS1053::begin();   
 
-  //vs1053.dumpRegs();
+  //dumpRegs();
   //Serial.print("Version = "); Serial.println(v);
-  if (v != 4) {
-    return false;
-  }
-  return true;
+  return (v == 4);
 }
 
 
