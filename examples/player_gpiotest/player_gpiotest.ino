@@ -16,19 +16,25 @@
 #include <Adafruit_VS1053.h>
 #include <SD.h>
 
-// define the pins used
-//#define CLK 13       // SPI Clock, shared with SD card
-//#define MISO 12      // Input data, from VS1053/SD card
-//#define MOSI 11      // Output data, to VS1053/SD card
-#define RESET 9      // VS1053 reset pin (output)
-#define CS 10        // VS1053 chip select pin (output)
-#define DCS 8        // VS1053 Data/command select pin (output)
-#define DREQ 3       // VS1053 Data request pin (into Arduino)
-#define CARDCS 4     // Card chip select pin
+// These are the pins used for the breakout example
+#define BREAKOUT_RESET  9      // VS1053 reset pin (output)
+#define BREAKOUT_CS     10     // VS1053 chip select pin (output)
+#define BREAKOUT_DCS    8      // VS1053 Data/command select pin (output)
+// These are the pins used for the music maker shield
+#define SHIELD_RESET  -1      // VS1053 reset pin (unused!)
+#define SHIELD_CS     7      // VS1053 chip select pin (output)
+#define SHIELD_DCS    6      // VS1053 Data/command select pin (output)
 
-Adafruit_VS1053_FilePlayer musicPlayer = Adafruit_VS1053_FilePlayer(RESET, CS, DCS, DREQ, CARDCS);
-// Alternately, use 'soft SPI'. Requires Adafruit's flexible SD library
-// Adafruit_VS1053_FilePlayer musicPlayer = Adafruit_VS1053_FilePlayer(MOSI, MISO, CLK, RESET, CS, DCS, DREQ, CARDCS);
+// These are common pins between breakout and shield
+#define CARDCS 4     // Card chip select pin
+// DREQ should be an Int pin, see http://arduino.cc/en/Reference/attachInterrupt
+#define DREQ 3       // VS1053 Data request, ideally an Interrupt pin
+
+Adafruit_VS1053_FilePlayer musicPlayer = 
+  // create breakout-example object!
+  Adafruit_VS1053_FilePlayer(BREAKOUT_RESET, BREAKOUT_CS, BREAKOUT_DCS, DREQ, CARDCS);
+  // create shield-example object!
+  //Adafruit_VS1053_FilePlayer(SHIELD_RESET, SHIELD_CS, SHIELD_DCS, DREQ, CARDCS);
 
 void setup() {
   Serial.begin(9600);

@@ -16,8 +16,14 @@
 
 // define the pins used
 #define VS1053_RX  2 // This is the pin that connects to the RX pin on VS1053
+
 #define VS1053_RESET 9 // This is the pin that connects to the RESET pin on VS1053
+// If you have the Music Maker shield, you don't need to connect the RESET pin!
+
+// If you're using the VS1053 breakout:
 // Don't forget to connect the GPIO #0 to GROUND and GPIO #1 pin to 3.3V
+// If you're using the Music Maker shield:
+// Don't forget to connect the GPIO #1 pin to 3.3V and the RX pin to digital #2
 
 // See http://www.vlsi.fi/fileadmin/datasheets/vs1053.pdf Pg 31
 #define VS1053_BANK_DEFAULT 0x00
@@ -114,4 +120,3 @@ void midiNoteOff(uint8_t chan, uint8_t n, uint8_t vel) {
   VS1053_MIDI.write(n);
   VS1053_MIDI.write(vel);
 }
-  
