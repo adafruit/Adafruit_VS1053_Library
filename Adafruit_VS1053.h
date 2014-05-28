@@ -123,6 +123,8 @@ class Adafruit_VS1053_FilePlayer : public Adafruit_VS1053 {
 			      int8_t cardCS);
   Adafruit_VS1053_FilePlayer (int8_t rst, int8_t cs, int8_t dcs, int8_t dreq,
 			      int8_t cardCS);
+  Adafruit_VS1053_FilePlayer (int8_t cs, int8_t dcs, int8_t dreq,
+			      int8_t cardCS);
 
   boolean begin(void);
   boolean useInterrupt(uint8_t type);
