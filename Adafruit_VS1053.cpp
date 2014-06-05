@@ -92,7 +92,7 @@ boolean Adafruit_VS1053_FilePlayer::useInterrupt(uint8_t type) {
       //Serial.println(dreqinttable[i]);
       if (_dreq == dreqinttable[i]) {
         INTERRUPT_TABLE_VALUE = dreqinttable[i+1];
-        attachInterrupt(dreqinttable[i+1], feeder, CHANGE);
+        attachInterrupt(dreqinttable[i+1], feeder, RISING);
         return true;
       }
     }
