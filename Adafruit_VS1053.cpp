@@ -29,7 +29,6 @@ static void feeder(void) {
 
 
 
-uint8_t INTERRUPT_TABLE_VALUE;
 static const uint8_t dreqinttable[] = {
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega328P__) || defined (__AVR_ATmega328__) || defined(__AVR_ATmega8__)
   2, 0,
@@ -91,7 +90,6 @@ boolean Adafruit_VS1053_FilePlayer::useInterrupt(uint8_t type) {
     for (uint8_t i=0; i<sizeof(dreqinttable); i+=2) {
       //Serial.println(dreqinttable[i]);
       if (_dreq == dreqinttable[i]) {
-        INTERRUPT_TABLE_VALUE = dreqinttable[i+1];
         attachInterrupt(dreqinttable[i+1], feeder, RISING);
         return true;
       }
@@ -181,8 +179,8 @@ boolean Adafruit_VS1053_FilePlayer::stopped(void) {
   return (!playingMusic && !currentTrack);
 }
 
-
 boolean Adafruit_VS1053_FilePlayer::startPlayingFile(char *trackname) {
+
   currentTrack = SD.open(trackname);
   if (!currentTrack) {
     return false;
@@ -193,19 +191,10 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(char *trackname) {
   // wait till its ready for data
   while (! readyForData() );
 
-
   // fill it up!
   while (readyForData()) {
-  // wrapping call to feedbuffer
-  // with detachInterrupt() and attachInterrupt() prevents collision with interrupt handler
-    detachInterrupt(INTERRUPT_TABLE_VALUE);
-      feedBuffer();
-    attachInterrupt(INTERRUPT_TABLE_VALUE, feeder, RISING);
+    feedBuffer();
   }
-
-
-//  Serial.println("Ready");
-
   return true;
 }
 
