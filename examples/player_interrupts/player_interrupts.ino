@@ -33,9 +33,12 @@
 
 Adafruit_VS1053_FilePlayer musicPlayer = 
   // create breakout-example object!
-  Adafruit_VS1053_FilePlayer(BREAKOUT_RESET, BREAKOUT_CS, BREAKOUT_DCS, DREQ, CARDCS);
+  //Adafruit_VS1053_FilePlayer(BREAKOUT_RESET, BREAKOUT_CS, BREAKOUT_DCS, DREQ, CARDCS);
   // create shield-example object!
-  //Adafruit_VS1053_FilePlayer(SHIELD_RESET, SHIELD_CS, SHIELD_DCS, DREQ, CARDCS);
+  Adafruit_VS1053_FilePlayer(SHIELD_RESET, SHIELD_CS, SHIELD_DCS, DREQ, CARDCS);
+
+
+////
 
 void setup() {
   Serial.begin(9600);
@@ -55,6 +58,9 @@ void setup() {
     while (1);  // don't do anything more
   }
   Serial.println("SD OK!");
+  
+  // list files
+  printDirectory(SD.open("/"), 0);
   
   // Set volume for left, right channels. lower numbers == louder volume!
   musicPlayer.setVolume(20,20);
@@ -82,8 +88,8 @@ void loop() {
 
   // Start playing a file, then we can do stuff while waiting for it to finish
   if (! musicPlayer.startPlayingFile("track001.mp3")) {
-    Serial.print("Could not open file");
-    return;
+    Serial.println("Could not open file track001.mp3");
+    while (1);
   }
   Serial.println(F("Started playing"));
 
@@ -95,3 +101,31 @@ void loop() {
   }
   Serial.println("Done playing music");
 }
+
+
+/// File listing helper
+void printDirectory(File dir, int numTabs) {
+   while(true) {
+     
+     File entry =  dir.openNextFile();
+     if (! entry) {
+       // no more files
+       //Serial.println("**nomorefiles**");
+       break;
+     }
+     for (uint8_t i=0; i<numTabs; i++) {
+       Serial.print('\t');
+     }
+     Serial.print(entry.name());
+     if (entry.isDirectory()) {
+       Serial.println("/");
+       printDirectory(entry, numTabs+1);
+     } else {
+       // files have sizes, directories do not
+       Serial.print("\t\t");
+       Serial.println(entry.size(), DEC);
+     }
+     entry.close();
+   }
+}
+
