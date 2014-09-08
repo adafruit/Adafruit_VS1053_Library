@@ -11,7 +11,8 @@
   Written by Limor Fried/Ladyada for Adafruit Industries.  
   BSD license, all text above must be included in any redistribution
  ****************************************************/
-
+#ifndef ADAFRUIT_VS1053_H
+#define ADAFRUIT_VS1053_H
 
 #if (ARDUINO >= 100)
  #include <Arduino.h>
@@ -141,3 +142,5 @@ class Adafruit_VS1053_FilePlayer : public Adafruit_VS1053 {
  private:
   uint8_t _cardCS;
 };
+
+#endif // ADAFRUIT_VS1053_H
