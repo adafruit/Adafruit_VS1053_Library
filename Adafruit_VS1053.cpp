@@ -193,7 +193,7 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(char *trackname) {
   
 
   // fill it up!
-  while (readyForData()) 
+  while (playingMusic && readyForData())
     feedBuffer();
 
 //  Serial.println("Ready");
