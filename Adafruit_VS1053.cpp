@@ -186,18 +186,23 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(char *trackname) {
     return false;
   }
 
+  // As explained in datasheet, set twice 0 in REG_DECODETIME to set time back to 0
+  sciWrite(VS1053_REG_DECODETIME, 0x00);
+  sciWrite(VS1053_REG_DECODETIME, 0x00);
+
+
   playingMusic = true;
 
   // wait till its ready for data
   while (! readyForData() );
-  
+
 
   // fill it up!
   while (playingMusic && readyForData())
     feedBuffer();
 
 //  Serial.println("Ready");
-  
+
   return true;
 }
 
