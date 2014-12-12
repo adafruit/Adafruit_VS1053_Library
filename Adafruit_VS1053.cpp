@@ -27,6 +27,8 @@ static void feeder(void) {
   myself->feedBuffer();
 }
 
+#define VS1053_CONTROL_SPI_SETTING  SPISettings(250000,  MSBFIRST, SPI_MODE0)
+#define VS1053_DATA_SPI_SETTING     SPISettings(8000000, MSBFIRST, SPI_MODE0)
 
 
 static const uint8_t dreqinttable[] = {
@@ -90,6 +92,9 @@ boolean Adafruit_VS1053_FilePlayer::useInterrupt(uint8_t type) {
     for (uint8_t i=0; i<sizeof(dreqinttable); i+=2) {
       //Serial.println(dreqinttable[i]);
       if (_dreq == dreqinttable[i]) {
+        #ifdef SPI_HAS_TRANSACTION
+        SPI.usingInterrupt(dreqinttable[i+1]);
+        #endif
 	attachInterrupt(dreqinttable[i+1], feeder, CHANGE);
 	return true;
       }
@@ -364,11 +369,17 @@ boolean Adafruit_VS1053::readyForData(void) {
 }
 
 void Adafruit_VS1053::playData(uint8_t *buffer, uint8_t buffsiz) {
+  #ifdef SPI_HAS_TRANSACTION
+  if (useHardwareSPI) SPI.beginTransaction(VS1053_DATA_SPI_SETTING);
+  #endif
   digitalWrite(_dcs, LOW);
   for (uint8_t i=0; i<buffsiz; i++) {
     spiwrite(buffer[i]);
   }
   digitalWrite(_dcs, HIGH);
+  #ifdef SPI_HAS_TRANSACTION
+  if (useHardwareSPI) SPI.endTransaction();
+  #endif
 }
 
 void Adafruit_VS1053::setVolume(uint8_t left, uint8_t right) {
@@ -559,6 +570,9 @@ boolean Adafruit_VS1053::GPIO_digitalRead(uint8_t i) {
 uint16_t Adafruit_VS1053::sciRead(uint8_t addr) {
   uint16_t data;
 
+  #ifdef SPI_HAS_TRANSACTION
+  if (useHardwareSPI) SPI.beginTransaction(VS1053_CONTROL_SPI_SETTING);
+  #endif
   digitalWrite(_cs, LOW);  
   spiwrite(VS1053_SCI_READ);
   spiwrite(addr);
@@ -567,18 +581,27 @@ uint16_t Adafruit_VS1053::sciRead(uint8_t addr) {
   data <<= 8;
   data |= spiread();
   digitalWrite(_cs, HIGH);
+  #ifdef SPI_HAS_TRANSACTION
+  if (useHardwareSPI) SPI.endTransaction();
+  #endif
 
   return data;
 }
 
 
 void Adafruit_VS1053::sciWrite(uint8_t addr, uint16_t data) {
+  #ifdef SPI_HAS_TRANSACTION
+  if (useHardwareSPI) SPI.beginTransaction(VS1053_CONTROL_SPI_SETTING);
+  #endif
   digitalWrite(_cs, LOW);  
   spiwrite(VS1053_SCI_WRITE);
   spiwrite(addr);
   spiwrite(data >> 8);
   spiwrite(data & 0xFF);
   digitalWrite(_cs, HIGH);
+  #ifdef SPI_HAS_TRANSACTION
+  if (useHardwareSPI) SPI.endTransaction();
+  #endif
 }
 
 
@@ -641,6 +664,9 @@ void Adafruit_VS1053::sineTest(uint8_t n, uint16_t ms) {
   while (!digitalRead(_dreq));
 	 //  delay(10);
 
+  #ifdef SPI_HAS_TRANSACTION
+  if (useHardwareSPI) SPI.beginTransaction(VS1053_DATA_SPI_SETTING);
+  #endif
   digitalWrite(_dcs, LOW);  
   spiwrite(0x53);
   spiwrite(0xEF);
@@ -651,9 +677,15 @@ void Adafruit_VS1053::sineTest(uint8_t n, uint16_t ms) {
   spiwrite(0x00);
   spiwrite(0x00);
   digitalWrite(_dcs, HIGH);  
+  #ifdef SPI_HAS_TRANSACTION
+  if (useHardwareSPI) SPI.endTransaction();
+  #endif
   
   delay(ms);
 
+  #ifdef SPI_HAS_TRANSACTION
+  if (useHardwareSPI) SPI.beginTransaction(VS1053_DATA_SPI_SETTING);
+  #endif
   digitalWrite(_dcs, LOW);  
   spiwrite(0x45);
   spiwrite(0x78);
@@ -664,4 +696,7 @@ void Adafruit_VS1053::sineTest(uint8_t n, uint16_t ms) {
   spiwrite(0x00);
   spiwrite(0x00);
   digitalWrite(_dcs, HIGH);  
+  #ifdef SPI_HAS_TRANSACTION
+  if (useHardwareSPI) SPI.endTransaction();
+  #endif
 }
