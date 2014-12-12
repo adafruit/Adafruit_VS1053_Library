@@ -207,13 +207,34 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(char *trackname) {
 }
 
 void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
+  static uint8_t running = 0;
+  uint8_t sregsave;
+
+  // Do not allow 2 copies of this code to run concurrently.
+  // If an interrupt causes feedBuffer() to run while another
+  // copy of feedBuffer() is already running in the main
+  // program, havoc can occur.  "running" detects this state
+  // and safely returns.
+  sregsave = SREG;
+  cli();
+  if (running) {
+    SREG = sregsave;
+    return;  // return safely, before touching hardware!  :-)
+  } else {
+    running = 1;
+    SREG = sregsave;
+  }
+
   if (! playingMusic) {
+    running = 0;
     return; // paused or stopped
   }
   if (! currentTrack) {
+    running = 0;
     return;
   }
   if (! readyForData()) {
+    running = 0;
     return;
   }
 
@@ -228,10 +249,12 @@ void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
       // must be at the end of the file, wrap it up!
       playingMusic = false;
       currentTrack.close();
+      running = 0;
       return;
     }
     playData(mp3buffer, bytesread);
   }
+  running = 0;
   return;
 }
 
