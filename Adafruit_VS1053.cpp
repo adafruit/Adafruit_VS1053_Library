@@ -92,6 +92,9 @@ boolean Adafruit_VS1053_FilePlayer::useInterrupt(uint8_t type) {
     for (uint8_t i=0; i<sizeof(dreqinttable); i+=2) {
       //Serial.println(dreqinttable[i]);
       if (_dreq == dreqinttable[i]) {
+        #ifdef SPI_HAS_TRANSACTION
+        SPI.usingInterrupt(dreqinttable[i+1]);
+        #endif
 	attachInterrupt(dreqinttable[i+1], feeder, CHANGE);
 	return true;
       }
@@ -169,11 +172,28 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(char *trackname) {
   return true;
 }
 
+
 void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
+  static uint8_t running = 0;
+  uint8_t sregsave;
+
+  // do not allow 2 copies of this code to run concurrently
+  sregsave = SREG;
+  cli();
+  if (running) {
+    SREG = sregsave;
+    return;
+  } else {
+    running = 1;
+    SREG = sregsave;
+  }
+
   if (! currentTrack) {
+    running = 0;
     return;
   }
   if (! readyForData()) {
+    running = 0;
     return;
   }
 
@@ -188,10 +208,12 @@ void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
       // must be at the end of the file, wrap it up!
       playingMusic = false;
       currentTrack.close();
+      running = 0;
       return;
     }
     playData(mp3buffer, bytesread);
   }
+  running = 0;
   return;
 }
 
