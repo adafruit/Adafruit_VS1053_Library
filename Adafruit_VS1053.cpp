@@ -141,7 +141,7 @@ boolean Adafruit_VS1053_FilePlayer::begin(void) {
 }
 
 
-boolean Adafruit_VS1053_FilePlayer::playFullFile(char *trackname) {
+boolean Adafruit_VS1053_FilePlayer::playFullFile(const char *trackname) {
   if (! startPlayingFile(trackname)) return false;
 
   while (playingMusic) {
@@ -152,7 +152,7 @@ boolean Adafruit_VS1053_FilePlayer::playFullFile(char *trackname) {
   return true;
 }
 
-boolean Adafruit_VS1053_FilePlayer::startPlayingFile(char *trackname) {
+boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   currentTrack = SD.open(trackname);
   if (!currentTrack) {
     return false;

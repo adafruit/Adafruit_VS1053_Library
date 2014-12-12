@@ -129,8 +129,8 @@ class Adafruit_VS1053_FilePlayer : public Adafruit_VS1053 {
   File currentTrack;
   boolean playingMusic;
   void feedBuffer(void);
-  boolean startPlayingFile(char *trackname);
-  boolean playFullFile(char *trackname);
+  boolean startPlayingFile(const char *trackname);
+  boolean playFullFile(const char *trackname);
 
  private:
   uint8_t _cardCS;
