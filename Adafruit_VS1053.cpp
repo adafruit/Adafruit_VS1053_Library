@@ -70,6 +70,9 @@ static const uint8_t dreqinttable[] = {
   0, 2,
   1, 3,
   7, 4,
+#elif defined(__AVR_ATmega256RFR2__)
+  4, 0,
+  5, 1,
 #endif
 };
 
