@@ -26,6 +26,15 @@
 #include <SPI.h> 
 #include <SD.h>
 
+#ifdef __SAM3X8E__
+typedef volatile RwReg PortReg;
+typedef uint32_t PortMask;
+#else
+typedef volatile uint8_t PortReg;
+typedef uint8_t PortMask;
+#endif
+
+
 #define VS1053_FILEPLAYER_TIMER0_INT 255 // allows useInterrupt to accept pins 0 to 254
 #define VS1053_FILEPLAYER_PIN_INT 5
 

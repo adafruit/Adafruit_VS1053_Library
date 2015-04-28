@@ -17,6 +17,10 @@
 
 static Adafruit_VS1053_FilePlayer *myself;
 
+#ifndef _BV
+  #define _BV(x) (1<<(x))
+#endif
+
 #if defined(__AVR__)
 SIGNAL(TIMER0_COMPA_vect) {
   myself->feedBuffer();
@@ -73,6 +77,15 @@ static const uint8_t dreqinttable[] = {
 #elif defined(__AVR_ATmega256RFR2__)
   4, 0,
   5, 1,
+#elif  defined(__SAM3X8E__)
+    0, 0, 1, 1, 2, 2, 3, 3, 4, 4,
+    5, 5, 6, 6, 7, 7, 8, 8, 9, 9,
+    10, 10, 11, 11, 12, 12, 13, 13, 14, 14,
+    15, 15, 16, 16, 17, 17, 18, 18, 19, 19,
+    20, 20, 21, 21, 22, 22, 23, 23, 24, 24,
+    25, 25, 26, 26, 27, 27, 28, 28, 29, 29,
+    30, 30, 31, 31, 32, 32, 33, 33,
+
 #endif
 };
 
@@ -227,6 +240,7 @@ void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
   static uint8_t running = 0;
   uint8_t sregsave;
 
+#ifndef __SAM3X8E__
   // Do not allow 2 copies of this code to run concurrently.
   // If an interrupt causes feedBuffer() to run while another
   // copy of feedBuffer() is already running in the main
@@ -241,7 +255,8 @@ void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
     running = 1;
     SREG = sregsave;
   }
-
+#endif
+    
   if (! playingMusic) {
     running = 0;
     return; // paused or stopped
@@ -279,8 +294,8 @@ void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
 /***************************************************************/
 
 /* VS1053 'low level' interface */
-static volatile uint8_t *clkportreg, *misoportreg, *mosiportreg;
-static uint8_t clkpin, misopin, mosipin;
+static volatile PortReg *clkportreg, *misoportreg, *mosiportreg;
+static PortMask clkpin, misopin, mosipin;
 
 Adafruit_VS1053::Adafruit_VS1053(int8_t mosi, int8_t miso, int8_t clk, 
 			   int8_t rst, int8_t cs, int8_t dcs, int8_t dreq) {
@@ -428,15 +443,15 @@ void Adafruit_VS1053::setVolume(uint8_t left, uint8_t right) {
   v <<= 8;
   v |= right;
 
-  cli();
+  noInterrupts(); //cli();
   sciWrite(VS1053_REG_VOLUME, v);
-  sei();
+  interrupts();  //sei();
 }
 
 uint16_t Adafruit_VS1053::decodeTime() {
-  cli();
+  noInterrupts(); //cli();
   uint16_t t = sciRead(VS1053_REG_DECODETIME);
-  sei();
+  interrupts(); //sei();
   return t;
 }
 
