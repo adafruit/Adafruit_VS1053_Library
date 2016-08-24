@@ -118,11 +118,19 @@ class Adafruit_VS1053 {
 
   uint8_t mp3buffer[VS1053_DATABUFFERLEN];
 
+#ifdef ARDUINO_ARCH_SAMD
+protected:
+  uint32_t  _dreq;
+private:
+  int32_t _mosi, _miso, _clk, _reset, _cs, _dcs;
+  boolean useHardwareSPI;
+#else
  protected:
   uint8_t  _dreq;
  private:
   int8_t _mosi, _miso, _clk, _reset, _cs, _dcs;
   boolean useHardwareSPI;
+#endif
 };
 
 

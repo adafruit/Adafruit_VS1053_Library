@@ -77,7 +77,7 @@ static const uint8_t dreqinttable[] = {
 #elif defined(__AVR_ATmega256RFR2__)
   4, 0,
   5, 1,
-#elif  defined(__SAM3X8E__)
+#elif  defined(__SAM3X8E__) || defined(ARDUINO_ARCH_SAMD)
     0, 0, 1, 1, 2, 2, 3, 3, 4, 4,
     5, 5, 6, 6, 7, 7, 8, 8, 9, 9,
     10, 10, 11, 11, 12, 12, 13, 13, 14, 14,
@@ -240,7 +240,7 @@ void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
   static uint8_t running = 0;
   uint8_t sregsave;
 
-#ifndef __SAM3X8E__
+#if !defined (__SAM3X8E__) && !defined (ARDUINO_ARCH_SAMD)
   // Do not allow 2 copies of this code to run concurrently.
   // If an interrupt causes feedBuffer() to run while another
   // copy of feedBuffer() is already running in the main
@@ -294,8 +294,13 @@ void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
 /***************************************************************/
 
 /* VS1053 'low level' interface */
+#ifdef ARDUINO_ARCH_SAMD
+static volatile uint32_t *clkportreg, *misoportreg, *mosiportreg;
+static uint32_t clkpin, misopin, mosipin;
+#else
 static volatile PortReg *clkportreg, *misoportreg, *mosiportreg;
 static PortMask clkpin, misopin, mosipin;
+#endif
 
 Adafruit_VS1053::Adafruit_VS1053(int8_t mosi, int8_t miso, int8_t clk, 
 			   int8_t rst, int8_t cs, int8_t dcs, int8_t dreq) {
