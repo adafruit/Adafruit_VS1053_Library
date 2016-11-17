@@ -21,19 +21,41 @@
  #include <pins_arduino.h>
 #endif
 
+#if !defined(ARDUINO_STM32_FEATHER)
 #include "pins_arduino.h"
 #include "wiring_private.h"
+#endif
+
 #include <SPI.h> 
 #include <SD.h>
 
-#ifdef __SAM3X8E__
-typedef volatile RwReg PortReg;
-typedef uint32_t PortMask;
+// define here the size of a register!
+#if defined(ARDUINO_STM32_FEATHER)
+  typedef volatile uint32 RwReg;
+  typedef uint32_t PortMask;
+#elif defined (__AVR__)
+  typedef volatile uint8_t RwReg;
+  typedef uint8_t PortMask;
+#elif defined (__arm__)
+  #if defined(TEENSYDUINO)
+  typedef volatile uint8_t RwReg;
+  typedef uint8_t PortMask;
+  #else
+  typedef volatile uint32_t RwReg;
+  typedef uint32_t PortMask;
+  #endif
+#elif defined (ESP8266) || defined (ESP32)
+  typedef volatile uint32_t RwReg;
+  typedef uint32_t PortMask;
+#elif defined (__ARDUINO_ARC__)
+  typedef volatile uint32_t RwReg;
+  typedef uint32_t PortMask;
 #else
-typedef volatile uint8_t PortReg;
-typedef uint8_t PortMask;
+  typedef volatile uint8_t RwReg;
+  typedef uint8_t PortMask;
 #endif
 
+typedef volatile RwReg PortReg;
 
 #define VS1053_FILEPLAYER_TIMER0_INT 255 // allows useInterrupt to accept pins 0 to 254
 #define VS1053_FILEPLAYER_PIN_INT 5
