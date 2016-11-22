@@ -81,7 +81,7 @@ boolean Adafruit_VS1053_FilePlayer::useInterrupt(uint8_t type) {
 #if defined(SPI_HAS_TRANSACTION) && !defined(ESP8266) && !defined(ESP32) && !defined(ARDUINO_STM32_FEATHER)
     SPI.usingInterrupt(irq);
 #endif
-    attachInterrupt(irq, feeder, FALLING);
+    attachInterrupt(irq, feeder, CHANGE);
     return true;
   }
   return false;
@@ -228,7 +228,6 @@ void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
   noInterrupts();
 #endif
 
-    
   if ((! playingMusic) // paused or stopped
       || (! currentTrack) 
       || (! readyForData())) {
@@ -236,7 +235,7 @@ void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
 #if defined(ARDUINO_STM32_FEATHER)
     interrupts();
 #endif
-    return;
+    return; // paused or stopped
   }
 
   // Feed the hungry buffer! :)
@@ -264,13 +263,8 @@ void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
 /***************************************************************/
 
 /* VS1053 'low level' interface */
-#if defined(ARDUINO_ARCH_SAMD) || defined(ESP8266)
-static volatile uint32_t *clkportreg, *misoportreg, *mosiportreg;
-static uint32_t clkpin, misopin, mosipin;
-#else
 static volatile PortReg *clkportreg, *misoportreg, *mosiportreg;
 static PortMask clkpin, misopin, mosipin;
-#endif
 
 Adafruit_VS1053::Adafruit_VS1053(int8_t mosi, int8_t miso, int8_t clk, 
 			   int8_t rst, int8_t cs, int8_t dcs, int8_t dreq) {
