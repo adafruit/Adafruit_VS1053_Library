@@ -115,6 +115,7 @@ class Adafruit_VS1053 {
   void sciWrite(uint8_t addr, uint16_t data);
   void sineTest(uint8_t n, uint16_t ms);
   void spiwrite(uint8_t d);
+  void spiwrite(uint8_t *c, uint16_t num); 
   uint8_t spiread(void);
 
   uint16_t decodeTime(void);
