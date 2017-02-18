@@ -215,10 +215,16 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
 }
 
 void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
+  noInterrupts();
+
   // dont run twice in case interrupts collided
-  if (feedBufferSem) return;
+  if (feedBufferSem) {
+    interrupts();
+    return;
+  }
 
   feedBufferSem = true;
+  interrupts();
 
   if ((! playingMusic) // paused or stopped
       || (! currentTrack) 
