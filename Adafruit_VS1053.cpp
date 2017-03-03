@@ -83,7 +83,7 @@ boolean Adafruit_VS1053_FilePlayer::useInterrupt(uint8_t type) {
     if (irq == -1) 
       return false;
 #if defined(SPI_HAS_TRANSACTION) && !defined(ESP8266) && !defined(ESP32) && !defined(ARDUINO_STM32_FEATHER)
-    SPI.usingInterrupt(irq);
+    VS1053SPI.usingInterrupt(irq);
 #endif
     attachInterrupt(irq, feeder, CHANGE);
     return true;
@@ -380,7 +380,7 @@ boolean Adafruit_VS1053::readyForData(void) {
 
 void Adafruit_VS1053::playData(uint8_t *buffer, uint8_t buffsiz) {
   #ifdef SPI_HAS_TRANSACTION
-  if (useHardwareSPI) SPI.beginTransaction(VS1053_DATA_SPI_SETTING);
+  if (useHardwareSPI) VS1053SPI.beginTransaction(VS1053_DATA_SPI_SETTING);
   #endif
   digitalWrite(_dcs, LOW);
   
@@ -388,7 +388,7 @@ void Adafruit_VS1053::playData(uint8_t *buffer, uint8_t buffsiz) {
 
   digitalWrite(_dcs, HIGH);
   #ifdef SPI_HAS_TRANSACTION
-  if (useHardwareSPI) SPI.endTransaction();
+  if (useHardwareSPI) VS1053SPI.endTransaction();
   #endif
 }
 
@@ -452,10 +452,10 @@ uint8_t Adafruit_VS1053::begin(void) {
     pinMode(_clk, OUTPUT);
     pinMode(_miso, INPUT);
   } else {
-    SPI.begin();
-    SPI.setDataMode(SPI_MODE0);
-    SPI.setBitOrder(MSBFIRST);
-    SPI.setClockDivider(SPI_CLOCK_DIV128); 
+    VS1053SPI.begin();
+    VS1053SPI.setDataMode(SPI_MODE0);
+    VS1053SPI.setBitOrder(MSBFIRST);
+    VS1053SPI.setClockDivider(SPI_CLOCK_DIV128); 
   }
 
   reset();
@@ -581,7 +581,7 @@ uint16_t Adafruit_VS1053::sciRead(uint8_t addr) {
   uint16_t data;
 
   #ifdef SPI_HAS_TRANSACTION
-  if (useHardwareSPI) SPI.beginTransaction(VS1053_CONTROL_SPI_SETTING);
+  if (useHardwareSPI) VS1053SPI.beginTransaction(VS1053_CONTROL_SPI_SETTING);
   #endif
   digitalWrite(_cs, LOW);  
   spiwrite(VS1053_SCI_READ);
@@ -592,7 +592,7 @@ uint16_t Adafruit_VS1053::sciRead(uint8_t addr) {
   data |= spiread();
   digitalWrite(_cs, HIGH);
   #ifdef SPI_HAS_TRANSACTION
-  if (useHardwareSPI) SPI.endTransaction();
+  if (useHardwareSPI) VS1053SPI.endTransaction();
   #endif
 
   return data;
@@ -601,7 +601,7 @@ uint16_t Adafruit_VS1053::sciRead(uint8_t addr) {
 
 void Adafruit_VS1053::sciWrite(uint8_t addr, uint16_t data) {
   #ifdef SPI_HAS_TRANSACTION
-  if (useHardwareSPI) SPI.beginTransaction(VS1053_CONTROL_SPI_SETTING);
+  if (useHardwareSPI) VS1053SPI.beginTransaction(VS1053_CONTROL_SPI_SETTING);
   #endif
   digitalWrite(_cs, LOW);  
   spiwrite(VS1053_SCI_WRITE);
@@ -610,7 +610,7 @@ void Adafruit_VS1053::sciWrite(uint8_t addr, uint16_t data) {
   spiwrite(data & 0xFF);
   digitalWrite(_cs, HIGH);
   #ifdef SPI_HAS_TRANSACTION
-  if (useHardwareSPI) SPI.endTransaction();
+  if (useHardwareSPI) VS1053SPI.endTransaction();
   #endif
 }
 
@@ -625,7 +625,7 @@ uint8_t Adafruit_VS1053::spiread(void)
   // Make sure clock starts low
 
   if (useHardwareSPI) {
-    x = SPI.transfer(0x00);
+    x = VS1053SPI.transfer(0x00);
   } else {
     for (i=7; i>=0; i--) {
       if ((*misoportreg) & misopin)
@@ -656,12 +656,12 @@ void Adafruit_VS1053::spiwrite(uint8_t *c, uint16_t num)
   if (useHardwareSPI) {
     
     //#if defined(ESP32)  // optimized
-    //  SPI.writeBytes(c, num);
+    //  VS1053SPI.writeBytes(c, num);
     //  return;
     //#endif
 
     while (num--) {
-      SPI.transfer(c[0]);
+      VS1053SPI.transfer(c[0]);
       c++;
     }
 
@@ -696,7 +696,7 @@ void Adafruit_VS1053::sineTest(uint8_t n, uint16_t ms) {
 	 //  delay(10);
 
   #ifdef SPI_HAS_TRANSACTION
-  if (useHardwareSPI) SPI.beginTransaction(VS1053_DATA_SPI_SETTING);
+  if (useHardwareSPI) VS1053SPI.beginTransaction(VS1053_DATA_SPI_SETTING);
   #endif
   digitalWrite(_dcs, LOW);  
   spiwrite(0x53);
@@ -709,13 +709,13 @@ void Adafruit_VS1053::sineTest(uint8_t n, uint16_t ms) {
   spiwrite(0x00);
   digitalWrite(_dcs, HIGH);  
   #ifdef SPI_HAS_TRANSACTION
-  if (useHardwareSPI) SPI.endTransaction();
+  if (useHardwareSPI) VS1053SPI.endTransaction();
   #endif
   
   delay(ms);
 
   #ifdef SPI_HAS_TRANSACTION
-  if (useHardwareSPI) SPI.beginTransaction(VS1053_DATA_SPI_SETTING);
+  if (useHardwareSPI) VS1053SPI.beginTransaction(VS1053_DATA_SPI_SETTING);
   #endif
   digitalWrite(_dcs, LOW);  
   spiwrite(0x45);
@@ -728,6 +728,6 @@ void Adafruit_VS1053::sineTest(uint8_t n, uint16_t ms) {
   spiwrite(0x00);
   digitalWrite(_dcs, HIGH);  
   #ifdef SPI_HAS_TRANSACTION
-  if (useHardwareSPI) SPI.endTransaction();
+  if (useHardwareSPI) VS1053SPI.endTransaction();
   #endif
 }

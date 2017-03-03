@@ -26,6 +26,10 @@
 #include "wiring_private.h"
 #endif
 
+#if !defined(VS1053SPI)
+#define VS1053SPI SPI
+#endif
+
 #include <SPI.h> 
 #include <SD.h>
 
