@@ -146,7 +146,7 @@ boolean Adafruit_VS1053_FilePlayer::playFullFile(const char *trackname) {
     noInterrupts();
     feedBuffer();
     interrupts();
-    delay(100);           // give IRQs a chance
+    delay(5);           // give IRQs a chance
   }
   // music file finished!
   return true;
