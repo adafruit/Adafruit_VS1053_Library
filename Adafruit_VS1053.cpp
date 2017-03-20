@@ -270,7 +270,11 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   playingMusic = true;
 
   // wait till its ready for data
-  while (! readyForData() );
+  while (! readyForData() ) {
+#if defined(ESP8266)
+	yield();
+#endif
+  }
 
   // fill it up!
   while (playingMusic && readyForData()) {
