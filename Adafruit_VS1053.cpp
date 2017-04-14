@@ -97,10 +97,6 @@ Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(
                : Adafruit_VS1053(rst, cs, dcs, dreq) {
 
   playingMusic = false;
-
-  // Set the card to be disabled while we get the VS1053 up
-  pinMode(_cardCS, OUTPUT);
-  digitalWrite(_cardCS, HIGH);  
 }
 
 Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(
@@ -109,10 +105,6 @@ Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(
   : Adafruit_VS1053(-1, cs, dcs, dreq) {
 
   playingMusic = false;
-
-  // Set the card to be disabled while we get the VS1053 up
-  pinMode(_cardCS, OUTPUT);
-  digitalWrite(_cardCS, HIGH);  
 }
 
 
@@ -123,10 +115,6 @@ Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(
                : Adafruit_VS1053(mosi, miso, clk, rst, cs, dcs, dreq) {
 
   playingMusic = false;
-
-  // Set the card to be disabled while we get the VS1053 up
-  pinMode(_cardCS, OUTPUT);
-  digitalWrite(_cardCS, HIGH);  
 }
 
 boolean Adafruit_VS1053_FilePlayer::begin(void) {
