@@ -182,6 +182,8 @@ class Adafruit_VS1053_FilePlayer : public Adafruit_VS1053 {
   void pausePlaying(boolean pause);
 
  private:
+  void feedBuffer_noLock(void);
+
   uint8_t _cardCS;
 };
 
