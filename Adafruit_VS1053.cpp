@@ -31,11 +31,9 @@ SIGNAL(TIMER0_COMPA_vect) {
 }
 #endif
 
-volatile boolean feedBufferSem = false;
+volatile boolean feedBufferLock = false;
 
 static void feeder(void) {
-  if (feedBufferSem) return;
-
   myself->feedBuffer();
 }
 
@@ -138,9 +136,7 @@ boolean Adafruit_VS1053_FilePlayer::playFullFile(const char *trackname) {
 
   while (playingMusic) {
     // twiddle thumbs
-    noInterrupts();
     feedBuffer();
-    interrupts();
     delay(5);           // give IRQs a chance
   }
   // music file finished!
@@ -214,15 +210,28 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
 }
 
 void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
+  noInterrupts();
   // dont run twice in case interrupts collided
-  if (feedBufferSem) return;
+  // This isn't a perfect lock as it may lose one feedBuffer request if
+  // an interrupt occurs before feedBufferLock is reset to false. This
+  // may cause a glitch in the audio but at least it will not corrupt
+  // state.
+  if (feedBufferLock) {
+    interrupts();
+    return;
+  }
+  feedBufferLock = true;
+  interrupts();
 
-  feedBufferSem = true;
+  feedBuffer_noLock();
 
+  feedBufferLock = false;
+}
+
+void Adafruit_VS1053_FilePlayer::feedBuffer_noLock(void) {
   if ((! playingMusic) // paused or stopped
       || (! currentTrack) 
       || (! readyForData())) {
-    feedBufferSem = false;
     return; // paused or stopped
   }
 
@@ -240,8 +249,6 @@ void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
 
     playData(mp3buffer, bytesread);
   }
-  feedBufferSem = false;
-  return;
 }
 
 
