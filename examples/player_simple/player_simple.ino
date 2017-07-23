@@ -84,7 +84,9 @@ void loop() {
   // File is playing in the background
   if (musicPlayer.stopped()) {
     Serial.println("Done playing music");
-    while (1);
+    while (1) {
+      delay(10);  // we're done! do nothing...
+    }
   }
   if (Serial.available()) {
     char c = Serial.read();
