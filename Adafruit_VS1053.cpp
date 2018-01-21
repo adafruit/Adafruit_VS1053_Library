@@ -37,8 +37,13 @@ static void feeder(void) {
   myself->feedBuffer();
 }
 
-#define VS1053_CONTROL_SPI_SETTING  SPISettings(250000,  MSBFIRST, SPI_MODE0)
-#define VS1053_DATA_SPI_SETTING     SPISettings(8000000, MSBFIRST, SPI_MODE0)
+#if defined(ESP8266)
+  #define VS1053_CONTROL_SPI_SETTING SPISettings(1000000, MSBFIRST, SPI_MODE0)
+  #define VS1053_DATA_SPI_SETTING SPISettings(20000000, MSBFIRST, SPI_MODE0)
+#else
+  #define VS1053_CONTROL_SPI_SETTING SPISettings(250000, MSBFIRST, SPI_MODE0)
+  #define VS1053_DATA_SPI_SETTING SPISettings(8000000, MSBFIRST, SPI_MODE0)
+#endif
 
 
 boolean Adafruit_VS1053_FilePlayer::useInterrupt(uint8_t type) {
