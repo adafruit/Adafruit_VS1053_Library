@@ -190,18 +190,6 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   sciWrite(VS1053_REG_DECODETIME, 0x00);
 
   playingMusic = true;
-
-  // wait till its ready for data
-  while (! readyForData() ) {
-#if defined(ESP8266)
-	yield();
-#endif
-  }
-
-  // fill it up!
-  while (playingMusic && readyForData()) {
-    feedBuffer();
-  }
   
   // ok going forward, we can use the IRQ
   interrupts();
