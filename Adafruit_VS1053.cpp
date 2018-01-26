@@ -156,8 +156,10 @@ void Adafruit_VS1053_FilePlayer::pausePlaying(boolean pause) {
   if (pause) 
     playingMusic = false;
   else {
-    playingMusic = true;
-    feedBuffer();
+    if (currentTrack) {
+      playingMusic = true;
+      feedBuffer();
+    }
   }
 }
 
@@ -376,8 +378,6 @@ uint16_t Adafruit_VS1053::loadPlugin(char *plugname) {
   plugin.close();
   return 0xFFFF;
 }
-
-
 
 
 boolean Adafruit_VS1053::readyForData(void) {
