@@ -712,7 +712,7 @@ void Adafruit_VS1053::sineTest(uint8_t n, uint16_t ms) {
 
   while (!readyForData()) {
 #if defined(ESP8266)
-	yield();
+	ESP.wdtFeed();
 #endif	
   }
 
