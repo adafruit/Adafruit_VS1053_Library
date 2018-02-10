@@ -586,6 +586,12 @@ boolean Adafruit_VS1053::GPIO_digitalRead(uint8_t i) {
 uint16_t Adafruit_VS1053::sciRead(uint8_t addr) {
   uint16_t data;
 
+  while (!readyForData()) {
+#if defined(ESP8266)
+	ESP.wdtFeed();
+#endif	
+  }
+  
   #ifdef SPI_HAS_TRANSACTION
   if (useHardwareSPI) SPI.beginTransaction(VS1053_CONTROL_SPI_SETTING);
   #endif
@@ -606,6 +612,12 @@ uint16_t Adafruit_VS1053::sciRead(uint8_t addr) {
 
 
 void Adafruit_VS1053::sciWrite(uint8_t addr, uint16_t data) {
+  while (!readyForData()) {
+#if defined(ESP8266)
+	ESP.wdtFeed();
+#endif	
+  }
+  
   #ifdef SPI_HAS_TRANSACTION
   if (useHardwareSPI) SPI.beginTransaction(VS1053_CONTROL_SPI_SETTING);
   #endif
@@ -698,8 +710,11 @@ void Adafruit_VS1053::sineTest(uint8_t n, uint16_t ms) {
   mode |= 0x0020;
   sciWrite(VS1053_REG_MODE, mode);
 
-  while (!digitalRead(_dreq));
-	 //  delay(10);
+  while (!readyForData()) {
+#if defined(ESP8266)
+	ESP.wdtFeed();
+#endif	
+  }
 
   #ifdef SPI_HAS_TRANSACTION
   if (useHardwareSPI) SPI.beginTransaction(VS1053_DATA_SPI_SETTING);
