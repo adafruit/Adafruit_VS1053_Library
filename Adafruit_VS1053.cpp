@@ -19,7 +19,7 @@
    #define digitalPinToInterrupt(x) x
 #endif
 
-#define SPI_HAS_TRANSACTION
+#define SPI_HAS_TRANSACTION 1
 
 static Adafruit_VS1053_FilePlayer *myself;
 
