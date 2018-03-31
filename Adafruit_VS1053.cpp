@@ -19,6 +19,8 @@
    #define digitalPinToInterrupt(x) x
 #endif
 
+#define SPI_HAS_TRANSACTION
+
 static Adafruit_VS1053_FilePlayer *myself;
 
 #ifndef _BV
