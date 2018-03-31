@@ -27,7 +27,7 @@
 #endif
 
 #include <SPI.h> 
-#include <SD.h>
+#include <SdFat.h>
 
 // define here the size of a register!
 #if defined(ARDUINO_STM32_FEATHER)
@@ -166,11 +166,12 @@ class Adafruit_VS1053_FilePlayer : public Adafruit_VS1053 {
 			      int8_t cardCS);
   Adafruit_VS1053_FilePlayer (int8_t cs, int8_t dcs, int8_t dreq,
 			      int8_t cardCS);
+  SdFile track;
 
   boolean begin(void);
   boolean useInterrupt(uint8_t type);
-  File currentTrack;
   volatile boolean playingMusic;
+  boolean errorPlaying; 
   void feedBuffer(void);
   boolean startPlayingFile(const char *trackname);
   boolean playFullFile(const char *trackname);

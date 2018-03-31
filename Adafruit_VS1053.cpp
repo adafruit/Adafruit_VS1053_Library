@@ -13,7 +13,7 @@
  ****************************************************/
 
 #include <Adafruit_VS1053.h>
-#include <SD.h>
+#include <SdFat.h>
 
 #if defined(ARDUINO_STM32_FEATHER)
    #define digitalPinToInterrupt(x) x
@@ -37,8 +37,8 @@ static void feeder(void) {
   myself->feedBuffer();
 }
 
-#define VS1053_CONTROL_SPI_SETTING  SPISettings(250000,  MSBFIRST, SPI_MODE0)
-#define VS1053_DATA_SPI_SETTING     SPISettings(8000000, MSBFIRST, SPI_MODE0)
+#define VS1053_CONTROL_SPI_SETTING  SPISettings(160000,  MSBFIRST, SPI_MODE0)
+#define VS1053_DATA_SPI_SETTING     SPISettings(48000000, MSBFIRST, SPI_MODE0)
 
 
 boolean Adafruit_VS1053_FilePlayer::useInterrupt(uint8_t type) {
@@ -94,7 +94,7 @@ Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(
 	       int8_t cardcs) 
                : Adafruit_VS1053(rst, cs, dcs, dreq) {
 
-  playingMusic = false;
+  playingMusic = errorPlaying = false;
   _cardCS = cardcs;
 }
 
@@ -103,7 +103,7 @@ Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(
 	       int8_t cardcs) 
   : Adafruit_VS1053(-1, cs, dcs, dreq) {
 
-  playingMusic = false;
+  playingMusic = errorPlaying = false;
   _cardCS = cardcs;
 }
 
@@ -114,7 +114,7 @@ Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(
 	       int8_t cardcs) 
                : Adafruit_VS1053(mosi, miso, clk, rst, cs, dcs, dreq) {
 
-  playingMusic = false;
+  playingMusic = errorPlaying = false;
   _cardCS = cardcs;
 }
 
@@ -149,7 +149,7 @@ void Adafruit_VS1053_FilePlayer::stopPlaying(void) {
   
   // wrap it up!
   playingMusic = false;
-  currentTrack.close();
+  track.close();
 }
 
 void Adafruit_VS1053_FilePlayer::pausePlaying(boolean pause) {
@@ -162,11 +162,11 @@ void Adafruit_VS1053_FilePlayer::pausePlaying(boolean pause) {
 }
 
 boolean Adafruit_VS1053_FilePlayer::paused(void) {
-  return (!playingMusic && currentTrack);
+  return (!playingMusic && track.isOpen	());
 }
 
 boolean Adafruit_VS1053_FilePlayer::stopped(void) {
-  return (!playingMusic && !currentTrack);
+  return (!playingMusic && !track.isOpen());
 }
 
 
@@ -177,8 +177,7 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   sciWrite(VS1053_REG_WRAMADDR, 0x1e29);
   sciWrite(VS1053_REG_WRAM, 0);
 
-  currentTrack = SD.open(trackname);
-  if (!currentTrack) {
+  if (!track.open(trackname, O_READ)) {
     return false;
   }
 
@@ -190,6 +189,7 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   sciWrite(VS1053_REG_DECODETIME, 0x00);
 
   playingMusic = true;
+  errorPlaying = false;
 
   // wait till its ready for data
   while (! readyForData() ) {
@@ -230,7 +230,7 @@ void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
 
 void Adafruit_VS1053_FilePlayer::feedBuffer_noLock(void) {
   if ((! playingMusic) // paused or stopped
-      || (! currentTrack) 
+      || (! track.isOpen()) 
       || (! readyForData())) {
     return; // paused or stopped
   }
@@ -238,12 +238,14 @@ void Adafruit_VS1053_FilePlayer::feedBuffer_noLock(void) {
   // Feed the hungry buffer! :)
   while (readyForData()) {
     // Read some audio data from the SD card file
-    int bytesread = currentTrack.read(mp3buffer, VS1053_DATABUFFERLEN);
     
-    if (bytesread == 0) {
+    int bytesread = track.read(mp3buffer, VS1053_DATABUFFERLEN);
+    if (bytesread < 1) {
       // must be at the end of the file, wrap it up!
       playingMusic = false;
-      currentTrack.close();
+      track.close();
+      //error playback 
+      if(bytesread == -1) errorPlaying = true;
       break;
     }
 
