@@ -238,19 +238,12 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   // resync
   sciWrite(VS1053_REG_WRAMADDR, 0x1e29);
   sciWrite(VS1053_REG_WRAM, 0);
-  
+
   currentTrack = SD.open(trackname);
-  
   if (!currentTrack) {
     return false;
   }
-  
-  // We know we have a valid file. Check if .mp3
-  // If so, check for ID3 tag and jump it if present.
-  if (isMP3File(trackname)) {
-    currentTrack.seek(mp3_ID3Jumper(currentTrack));
-  }
-  
+
   // don't let the IRQ get triggered by accident here
   noInterrupts();
 
@@ -528,9 +521,11 @@ uint8_t Adafruit_VS1053::begin(void) {
     pinMode(_miso, INPUT);
   } else {
     SPI.begin();
+#ifndef SPI_HAS_TRANSACTION
     SPI.setDataMode(SPI_MODE0);
     SPI.setBitOrder(MSBFIRST);
     SPI.setClockDivider(SPI_CLOCK_DIV128); 
+#endif
   }
 
   reset();
