@@ -74,10 +74,10 @@ void setup() {
   
   // Play one file, don't return until complete
   Serial.println(F("Playing track 001"));
-  musicPlayer.playFullFile("track001.mp3");
+  musicPlayer.playFullFile("/track001.mp3");
   // Play another file in the background, REQUIRES interrupts!
   Serial.println(F("Playing track 002"));
-  musicPlayer.startPlayingFile("track002.mp3");
+  musicPlayer.startPlayingFile("/track002.mp3");
 }
 
 void loop() {

@@ -102,10 +102,10 @@ void setup() {
   
   // Play a file in the background, REQUIRES interrupts!
   Serial.println(F("Playing full track 001"));
-  musicPlayer.playFullFile("track001.mp3");
+  musicPlayer.playFullFile("/track001.mp3");
 
   Serial.println(F("Playing track 002"));
-  musicPlayer.startPlayingFile("track002.mp3");
+  musicPlayer.startPlayingFile("/track002.mp3");
 }
 
 void loop() {

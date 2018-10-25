@@ -87,7 +87,7 @@ void loop() {
   musicPlayer.playFullFile("track001.ogg");
 
   // Start playing a file, then we can do stuff while waiting for it to finish
-  if (! musicPlayer.startPlayingFile("track001.mp3")) {
+  if (! musicPlayer.startPlayingFile("/track001.mp3")) {
     Serial.println("Could not open file track001.mp3");
     while (1);
   }
