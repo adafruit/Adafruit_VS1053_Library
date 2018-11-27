@@ -36,13 +36,13 @@
   #define CARDCS          PC5     // Card chip select pin
   #define VS1053_DREQ     PA15    // VS1053 Data request, ideally an Interrupt pin
 
-#elif defined(ARDUINO_FEATHER52)
+#elif defined(ARDUINO_NRF52832_FEATHER )
   #define VS1053_CS       30     // VS1053 chip select pin (output)
   #define VS1053_DCS      11     // VS1053 Data/command select pin (output)
   #define CARDCS          27     // Card chip select pin
   #define VS1053_DREQ     31     // VS1053 Data request, ideally an Interrupt pin
 
-// Feather M4 M0, 328, or 32u4
+// Feather M4, M0, 328, nRF52840 or 32u4
 #else
   #define VS1053_CS       6     // VS1053 chip select pin (output)
   #define VS1053_DCS     10     // VS1053 Data/command select pin (output)
@@ -59,12 +59,12 @@ Adafruit_VS1053_FilePlayer musicPlayer =
 void setup() {
   Serial.begin(115200);
 
-  // if you're using Bluefruit or LoRa/RFM Feather, disable the BLE interface
+  // if you're using Bluefruit or LoRa/RFM Feather, disable the radio module
   //pinMode(8, INPUT_PULLUP);
 
   // Wait for serial port to be opened, remove this line for 'standalone' operation
   while (!Serial) { delay(1); }
-
+  delay(500);
   Serial.println("\n\nAdafruit VS1053 Feather Test");
   
   if (! musicPlayer.begin()) { // initialise the music player
@@ -164,5 +164,3 @@ void printDirectory(File dir, int numTabs) {
      entry.close();
    }
 }
-
-
