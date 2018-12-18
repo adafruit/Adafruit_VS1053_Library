@@ -27,7 +27,12 @@
 #endif
 
 #include <SPI.h> 
-#include <SD.h>
+#if defined(PREFER_SDFAT_LIBRARY)
+ #include <SdFat.h>
+ extern SdFat SD;
+#else
+ #include <SD.h>
+#endif
 
 // define here the size of a register!
 #if defined(ARDUINO_STM32_FEATHER)

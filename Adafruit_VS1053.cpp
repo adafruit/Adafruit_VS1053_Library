@@ -13,7 +13,6 @@
  ****************************************************/
 
 #include <Adafruit_VS1053.h>
-#include <SD.h>
 
 #if defined(ARDUINO_STM32_FEATHER)
    #define digitalPinToInterrupt(x) x
