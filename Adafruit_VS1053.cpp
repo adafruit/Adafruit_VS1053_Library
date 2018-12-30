@@ -225,6 +225,12 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   if (!currentTrack) {
     return false;
   }
+    
+  // We know we have a valid file. Check if .mp3
+  // If so, check for ID3 tag and jump it if present.
+  if (isMP3File(trackname)) {
+    currentTrack.seek(mp3_ID3Jumper(currentTrack));
+  }
 
   // don't let the IRQ get triggered by accident here
   noInterrupts();
