@@ -169,6 +169,68 @@ boolean Adafruit_VS1053_FilePlayer::stopped(void) {
   return (!playingMusic && !currentTrack);
 }
 
+// Just checks to see if the name ends in ".mp3"
+boolean Adafruit_VS1053_FilePlayer::isMP3File(const char* fileName) {
+    
+    int   numChars;
+    char  dotMP3[] = ".MP3";
+    
+    if (fileName) {                 // Sanity.
+        numChars = strlen(fileName);
+        if (numChars>4) {
+            byte index = 0;
+            for(byte i=numChars-4;i<numChars;i++) {
+                if(!(toupper(fileName[i]) == dotMP3[index])) {
+                    return false;
+                }
+                index++;
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+
+unsigned long Adafruit_VS1053_FilePlayer::mp3_ID3Jumper(File mp3) {
+
+  char 					tag[4];
+  uint32_t 			start;
+	unsigned long current;
+	
+  start = 0;
+  if (mp3) {
+  	current = mp3.position();
+    if (mp3.seek(0)) {
+      if (mp3.read(tag,3)) {
+      	tag[3] = '\0';
+        if (!strcmp(tag, "ID3")) {
+          if (mp3.seek(6)) {
+          	start = 0ul ;
+  					for (byte i = 0 ; i < 4 ; i++) {
+    					start <<= 7 ;
+    					start |= (0x7F & mp3.read()) ;
+  					}
+          } else {
+            //Serial.println("Second seek failed?");
+          }
+        } else {
+          //Serial.println("It wasn't the damn TAG.");
+        }
+      } else {
+        //Serial.println("Read for the tag failed");
+      }
+    } else {
+      //Serial.println("Seek failed? How can seek fail?");
+    }
+    mp3.seek(current);	// Put you things away like you found 'em.
+  } else {
+    //Serial.println("They handed us a NULL file!");
+  }
+  //Serial.print("Jumper returning: "); Serial.println(start);
+  return start;
+}
+
 
 boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   // reset playback
