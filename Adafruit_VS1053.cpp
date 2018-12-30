@@ -171,26 +171,8 @@ boolean Adafruit_VS1053_FilePlayer::stopped(void) {
 
 // Just checks to see if the name ends in ".mp3"
 boolean Adafruit_VS1053_FilePlayer::isMP3File(const char* fileName) {
-    
-    int   numChars;
-    char  dotMP3[] = ".MP3";
-    
-    if (fileName) {                 // Sanity.
-        numChars = strlen(fileName);
-        if (numChars>4) {
-            byte index = 0;
-            for(byte i=numChars-4;i<numChars;i++) {
-                if(!(toupper(fileName[i]) == dotMP3[index])) {
-                    return false;
-                }
-                index++;
-            }
-            return true;
-        }
-    }
-    return false;
+    return (strlen(fileName) > 4) && !strcasecmp(fileName + strlen(fileName) - 4, ".mp3");
 }
-
 
 unsigned long Adafruit_VS1053_FilePlayer::mp3_ID3Jumper(File mp3) {
 
