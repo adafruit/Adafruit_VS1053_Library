@@ -13,7 +13,6 @@
  ****************************************************/
 
 #include <Adafruit_VS1053.h>
-#include <SdFat.h>
 
 #if defined(ARDUINO_STM32_FEATHER)
    #define digitalPinToInterrupt(x) x
@@ -463,9 +462,11 @@ uint8_t Adafruit_VS1053::begin(void) {
     pinMode(_miso, INPUT);
   } else {
     SPI.begin();
+#ifndef SPI_HAS_TRANSACTION
     SPI.setDataMode(SPI_MODE0);
     SPI.setBitOrder(MSBFIRST);
     SPI.setClockDivider(SPI_CLOCK_DIV128); 
+#endif
   }
 
   reset();

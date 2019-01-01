@@ -8,16 +8,8 @@
 // These are the pins used
 #define VS1053_RESET   -1     // VS1053 reset pin (not used!)
 
-// Feather M0 or 32u4
-#if defined(__AVR__) || defined(ARDUINO_SAMD_FEATHER_M0)
-  #define VS1053_CS       6     // VS1053 chip select pin (output)
-  #define VS1053_DCS     10     // VS1053 Data/command select pin (output)
-  #define CARDCS          5     // Card chip select pin
-  // DREQ should be an Int pin *if possible* (not possible on 32u4)
-  #define VS1053_DREQ     9     // VS1053 Data request, ideally an Interrupt pin
-
 // Feather ESP8266
-#elif defined(ESP8266)
+#if defined(ESP8266)
   #define VS1053_CS      16     // VS1053 chip select pin (output)
   #define VS1053_DCS     15     // VS1053 Data/command select pin (output)
   #define CARDCS          2     // Card chip select pin
@@ -44,11 +36,20 @@
   #define CARDCS          PC5     // Card chip select pin
   #define VS1053_DREQ     PA15    // VS1053 Data request, ideally an Interrupt pin
 
-#elif defined(ARDUINO_FEATHER52)
+#elif defined(ARDUINO_NRF52832_FEATHER )
   #define VS1053_CS       30     // VS1053 chip select pin (output)
   #define VS1053_DCS      11     // VS1053 Data/command select pin (output)
   #define CARDCS          27     // Card chip select pin
   #define VS1053_DREQ     31     // VS1053 Data request, ideally an Interrupt pin
+
+// Feather M4, M0, 328, nRF52840 or 32u4
+#else
+  #define VS1053_CS       6     // VS1053 chip select pin (output)
+  #define VS1053_DCS     10     // VS1053 Data/command select pin (output)
+  #define CARDCS          5     // Card chip select pin
+  // DREQ should be an Int pin *if possible* (not possible on 32u4)
+  #define VS1053_DREQ     9     // VS1053 Data request, ideally an Interrupt pin
+
 #endif
 
 
@@ -58,12 +59,12 @@ Adafruit_VS1053_FilePlayer musicPlayer =
 void setup() {
   Serial.begin(115200);
 
-  // if you're using Bluefruit or LoRa/RFM Feather, disable the BLE interface
+  // if you're using Bluefruit or LoRa/RFM Feather, disable the radio module
   //pinMode(8, INPUT_PULLUP);
 
   // Wait for serial port to be opened, remove this line for 'standalone' operation
   while (!Serial) { delay(1); }
-
+  delay(500);
   Serial.println("\n\nAdafruit VS1053 Feather Test");
   
   if (! musicPlayer.begin()) { // initialise the music player
@@ -91,8 +92,6 @@ void setup() {
   // Timer interrupts are not suggested, better to use DREQ interrupt!
   // but we don't have them on the 32u4 feather...
   musicPlayer.useInterrupt(VS1053_FILEPLAYER_TIMER0_INT); // timer int
-#elif defined(ESP32)
-  // no IRQ! doesn't work yet :/
 #else
   // If DREQ is on an interrupt pin we can do background
   // audio playing
@@ -101,10 +100,10 @@ void setup() {
   
   // Play a file in the background, REQUIRES interrupts!
   Serial.println(F("Playing full track 001"));
-  musicPlayer.playFullFile("track001.mp3");
+  musicPlayer.playFullFile("/track001.mp3");
 
   Serial.println(F("Playing track 002"));
-  musicPlayer.startPlayingFile("track002.mp3");
+  musicPlayer.startPlayingFile("/track002.mp3");
 }
 
 void loop() {
@@ -165,5 +164,3 @@ void printDirectory(File dir, int numTabs) {
      entry.close();
    }
 }
-
-
