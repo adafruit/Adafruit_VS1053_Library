@@ -101,7 +101,7 @@ typedef volatile RwReg PortReg;
 #define VS1053_SCI_AICTRL3 0x0F
 
 #define VS1053_DATABUFFERLEN 32
-
+#define NUMBER_OF_BUFFERS 8000
 
 class Adafruit_VS1053 {
  public:

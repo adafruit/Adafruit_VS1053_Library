@@ -210,7 +210,7 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   // ok going forward, we can use the IRQ
   interrupts();
 
-  return true;
+  return !errorPlaying;
 }
 
 void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
@@ -238,22 +238,24 @@ void Adafruit_VS1053_FilePlayer::feedBuffer_noLock(void) {
       || (! readyForData())) {
     return; // paused or stopped
   }
-
+  int blocking = 0;
   // Feed the hungry buffer! :)
   while (readyForData()) {
     // Read some audio data from the SD card file
     
     int bytesread = track.read(mp3buffer, VS1053_DATABUFFERLEN);
-    if (bytesread < 1) {
+    if (bytesread < 1 || blocking >= NUMBER_OF_BUFFERS) {
       // must be at the end of the file, wrap it up!
       playingMusic = false;
       track.close();
+      stopPlaying();
       //error playback 
-      if(bytesread == -1) errorPlaying = true;
+      if(bytesread == -1 || blocking >= NUMBER_OF_BUFFERS) errorPlaying = true;
       break;
     }
 
     playData(mp3buffer, bytesread);
+    blocking++;
   }
 }
 
@@ -324,6 +326,62 @@ void Adafruit_VS1053::applyPatch(const uint16_t *patch, uint16_t patchsize) {
       }
     }
   }
+}
+
+
+uint16_t Adafruit_VS1053::loadPlugin(char *plugname) {
+  SdFile plugin;
+  plugin.open(plugname, O_READ);
+  if (!plugin.isOpen()) {
+    Serial.println("Couldn't open the plugin file");
+    return 0xFFFF;
+  }
+
+  if ((plugin.read() != 'P') ||
+      (plugin.read() != '&') ||
+      (plugin.read() != 'H'))
+    return 0xFFFF;
+
+  uint16_t type;
+
+ // Serial.print("Patch size: "); Serial.println(patchsize);
+  while ((type = plugin.read()) >= 0) {
+    uint16_t offsets[] = {0x8000UL, 0x0, 0x4000UL};
+    uint16_t addr, len;
+
+    //Serial.print("type: "); Serial.println(type, HEX);
+
+    if (type >= 4) {
+        plugin.close();
+	return 0xFFFF;
+    }
+
+    len = plugin.read();    len <<= 8;
+    len |= plugin.read() & ~1;
+    addr = plugin.read();    addr <<= 8;
+    addr |= plugin.read();
+    //Serial.print("len: "); Serial.print(len); 
+    //Serial.print(" addr: $"); Serial.println(addr, HEX);
+
+    if (type == 3) {
+      // execute rec!
+      plugin.close();
+      return addr;
+    }
+
+    // set address
+    sciWrite(VS1053_REG_WRAMADDR, addr + offsets[type]);
+    // write data
+    do {
+      uint16_t data;
+      data = plugin.read();    data <<= 8;
+      data |= plugin.read();
+      sciWrite(VS1053_REG_WRAM, data);
+    } while ((len -=2));
+  }
+
+  plugin.close();
+  return 0xFFFF;
 }
 
 boolean Adafruit_VS1053::readyForData(void) {
