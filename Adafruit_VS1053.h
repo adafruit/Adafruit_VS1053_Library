@@ -14,6 +14,8 @@
 #ifndef ADAFRUIT_VS1053_H
 #define ADAFRUIT_VS1053_H
 
+#define PREFER_SDFAT_LIBRARY
+
 #if (ARDUINO >= 100)
  #include <Arduino.h>
 #else
@@ -29,7 +31,7 @@
 #include <SPI.h> 
 #if defined(PREFER_SDFAT_LIBRARY)
  #include <SdFat.h>
- extern SdFat SD;
+//  extern SdFat SD;
 #else
  #include <SD.h>
 #endif
