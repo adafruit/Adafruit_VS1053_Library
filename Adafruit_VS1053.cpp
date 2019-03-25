@@ -170,28 +170,28 @@ boolean Adafruit_VS1053_FilePlayer::stopped(void) {
 
 // Just checks to see if the name ends in ".mp3"
 boolean Adafruit_VS1053_FilePlayer::isMP3File(const char* fileName) {
-    return (strlen(fileName) > 4) && !strcasecmp(fileName + strlen(fileName) - 4, ".mp3");
+  return (strlen(fileName) > 4) && !strcasecmp(fileName + strlen(fileName) - 4, ".mp3");
 }
 
 unsigned long Adafruit_VS1053_FilePlayer::mp3_ID3Jumper(File mp3) {
 
-  char 					tag[4];
-  uint32_t 			start;
-	unsigned long current;
+  char tag[4];
+  uint32_t start;
+  unsigned long current;
 	
   start = 0;
   if (mp3) {
   	current = mp3.position();
     if (mp3.seek(0)) {
-      if (mp3.read(tag,3)) {
+      if (mp3.read((uint8_t*) tag,3)) {
       	tag[3] = '\0';
         if (!strcmp(tag, "ID3")) {
           if (mp3.seek(6)) {
-          	start = 0ul ;
-  					for (byte i = 0 ; i < 4 ; i++) {
-    					start <<= 7 ;
-    					start |= (0x7F & mp3.read()) ;
-  					}
+            start = 0ul ;
+            for (byte i = 0 ; i < 4 ; i++) {
+              start <<= 7 ;
+              start |= (0x7F & mp3.read()) ;
+  	        }
           } else {
             //Serial.println("Second seek failed?");
           }
