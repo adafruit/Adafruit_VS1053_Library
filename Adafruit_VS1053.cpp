@@ -187,11 +187,11 @@ unsigned long Adafruit_VS1053_FilePlayer::mp3_ID3Jumper(File mp3) {
       	tag[3] = '\0';
         if (!strcmp(tag, "ID3")) {
           if (mp3.seek(6)) {
-          	start = 0ul ;
+            start = 0ul ;
             for (byte i = 0 ; i < 4 ; i++) {
               start <<= 7 ;
               start |= (0x7F & mp3.read()) ;
-  			}
+  	        }
           } else {
             //Serial.println("Second seek failed?");
           }
