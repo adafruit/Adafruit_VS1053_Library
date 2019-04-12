@@ -124,6 +124,7 @@ class Adafruit_VS1053 {
   uint8_t spiread(void);
 
   uint16_t decodeTime(void);
+  void setVolume(uint8_t volume);
   void setVolume(uint8_t left, uint8_t right);
   void dumpRegs(void);
 
