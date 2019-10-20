@@ -103,7 +103,7 @@ void loop() {
   }
   if (isRecording)
     saveRecordedData(isRecording);
-  if (isRecording && !digitalRead(REC_BUTTON)) {
+  if (isRecording && digitalRead(REC_BUTTON)) {
     Serial.println("End recording");
     musicPlayer.stopRecordOgg();
     isRecording = false;

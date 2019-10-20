@@ -27,7 +27,12 @@
 #endif
 
 #include <SPI.h> 
-#include <SD.h>
+#if defined(PREFER_SDFAT_LIBRARY)
+ #include <SdFat.h>
+ extern SdFat SD;
+#else
+ #include <SD.h>
+#endif
 
 // define here the size of a register!
 #if defined(ARDUINO_STM32_FEATHER)
@@ -172,6 +177,8 @@ class Adafruit_VS1053_FilePlayer : public Adafruit_VS1053 {
   File currentTrack;
   volatile boolean playingMusic;
   void feedBuffer(void);
+  static boolean isMP3File(const char* fileName);
+  unsigned long mp3_ID3Jumper(File mp3);
   boolean startPlayingFile(const char *trackname);
   boolean playFullFile(const char *trackname);
   void stopPlaying(void);
