@@ -18,10 +18,7 @@
 #define MIDI_CHAN_PROGRAM 0xC0
 
 
-#if defined(ESP32)
-  HardwareSerial Serial1(2);
-  #define VS1053_MIDI Serial1
-#elif defined(ESP8266)
+#if defined(ESP8266) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__)
   #define VS1053_MIDI Serial
 #else
   // anything else? use the hardware serial1 port
