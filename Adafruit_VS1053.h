@@ -176,7 +176,11 @@ class Adafruit_VS1053_FilePlayer : public Adafruit_VS1053 {
   boolean useInterrupt(uint8_t type);
   File currentTrack;
   volatile boolean playingMusic;
+#if defined(ESP8266)
+  void ICACHE_RAM_ATTR feedBuffer(void);
+#else
   void feedBuffer(void);
+#endif
   static boolean isMP3File(const char* fileName);
   unsigned long mp3_ID3Jumper(File mp3);
   boolean startPlayingFile(const char *trackname);

@@ -32,9 +32,16 @@ SIGNAL(TIMER0_COMPA_vect) {
 
 volatile boolean feedBufferLock = false;
 
+#if defined(ESP8266)
+static void ICACHE_RAM_ATTR feeder(void) {
+  myself->feedBuffer();
+}
+#else
 static void feeder(void) {
   myself->feedBuffer();
 }
+#endif
+
 
 #define VS1053_CONTROL_SPI_SETTING  SPISettings(250000,  MSBFIRST, SPI_MODE0)
 #define VS1053_DATA_SPI_SETTING     SPISettings(8000000, MSBFIRST, SPI_MODE0)
@@ -257,7 +264,26 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
 
   return true;
 }
+#if defined(ESP8266)
+void ICACHE_RAM_ATTR Adafruit_VS1053_FilePlayer::feedBuffer(void) {
+  noInterrupts();
+  // dont run twice in case interrupts collided
+  // This isn't a perfect lock as it may lose one feedBuffer request if
+  // an interrupt occurs before feedBufferLock is reset to false. This
+  // may cause a glitch in the audio but at least it will not corrupt
+  // state.
+  if (feedBufferLock) {
+    interrupts();
+    return;
+  }
+  feedBufferLock = true;
+  interrupts();
 
+  feedBuffer_noLock();
+
+  feedBufferLock = false;
+}
+#else
 void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
   noInterrupts();
   // dont run twice in case interrupts collided
@@ -276,6 +302,7 @@ void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
 
   feedBufferLock = false;
 }
+#endif
 
 void Adafruit_VS1053_FilePlayer::feedBuffer_noLock(void) {
   if ((! playingMusic) // paused or stopped
