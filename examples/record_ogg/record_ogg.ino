@@ -33,7 +33,7 @@
 #define CS 10        // VS1053 chip select pin (output)
 #define DCS 8        // VS1053 Data/command select pin (output)
 #define CARDCS A0     // Card chip select pin
-#define DREQ A1       // VS1053 Data request, ideally an Interrupt pin
+#define DREQ 3       // VS1053 Data request, ideally an Interrupt pin
 
 #define REC_BUTTON 7
 
