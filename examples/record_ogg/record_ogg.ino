@@ -170,7 +170,7 @@ uint16_t saveRecordedData(boolean isrecord) {
       written += addr;
     }
     musicPlayer.sciRead(VS1053_SCI_AICTRL3);
-    if (! (musicPlayer.sciRead(VS1053_SCI_AICTRL3) & _BV(2))) {
+    if (! (musicPlayer.sciRead(VS1053_SCI_AICTRL3) & (1 << 2))) {
        recording.write(musicPlayer.recordedReadWord() & 0xFF);
        written++;
     }
