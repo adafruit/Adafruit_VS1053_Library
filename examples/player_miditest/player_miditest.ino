@@ -12,8 +12,6 @@
   BSD license, all text above must be included in any redistribution
  ****************************************************/
 
-#include <SoftwareSerial.h>
-
 // define the pins used
 #define VS1053_RX  2 // This is the pin that connects to the RX pin on VS1053
 
@@ -41,10 +39,16 @@
 #define MIDI_CHAN_VOLUME 0x07
 #define MIDI_CHAN_PROGRAM 0xC0
 
+#if defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__)
+  #include <SoftwareSerial.h>
+  SoftwareSerial VS1053_MIDI(0, 2); // TX only, do not use the 'rx' side
+#else
+  // on a Mega/Leonardo you may have to change the pin to one that 
+  // software serial support uses OR use a hardware serial port!
+  #define VS1053_MIDI Serial1
+#endif
 
-SoftwareSerial VS1053_MIDI(0, 2); // TX only, do not use the 'rx' side
-// on a Mega/Leonardo you may have to change the pin to one that 
-// software serial support uses OR use a hardware serial port!
+
 
 void setup() {
   Serial.begin(9600);

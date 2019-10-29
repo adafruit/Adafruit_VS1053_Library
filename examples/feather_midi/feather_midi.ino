@@ -18,13 +18,11 @@
 #define MIDI_CHAN_PROGRAM 0xC0
 
 
-#if defined(__AVR_ATmega32U4__) || defined(ARDUINO_SAMD_FEATHER_M0) || defined(TEENSYDUINO) || defined(ARDUINO_STM32_FEATHER)
-  #define VS1053_MIDI Serial1
-#elif defined(ESP32)
-  HardwareSerial Serial1(2);
-  #define VS1053_MIDI Serial1
-#elif defined(ESP8266)
+#if defined(ESP8266) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__)
   #define VS1053_MIDI Serial
+#else
+  // anything else? use the hardware serial1 port
+  #define VS1053_MIDI Serial1
 #endif
 
 void setup() {
