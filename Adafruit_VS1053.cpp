@@ -32,7 +32,7 @@ SIGNAL(TIMER0_COMPA_vect) {
 
 volatile boolean feedBufferLock = false;
 
-static void feeder(void) {
+ICACHE_RAM_ATTR static void feeder(void) {
   myself->feedBuffer();
 }
 
