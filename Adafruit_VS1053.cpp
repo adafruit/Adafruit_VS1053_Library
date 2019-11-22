@@ -32,7 +32,10 @@ SIGNAL(TIMER0_COMPA_vect) {
 
 volatile boolean feedBufferLock = false;
 
-ICACHE_RAM_ATTR static void feeder(void) {
+#if defined(ESP8266)
+ICACHE_RAM_ATTR
+#endif
+static void feeder(void) {
   myself->feedBuffer();
 }
 
