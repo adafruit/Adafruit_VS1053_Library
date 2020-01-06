@@ -216,7 +216,7 @@ unsigned long Adafruit_VS1053_FilePlayer::mp3_ID3Jumper(File mp3) {
 }
 
 
-boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
+boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname, uint32_t pos) {
   // reset playback
   sciWrite(VS1053_REG_MODE, VS1053_MODE_SM_LINE1 | VS1053_MODE_SM_SDINEW);
   // resync
@@ -231,7 +231,9 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   // We know we have a valid file. Check if .mp3
   // If so, check for ID3 tag and jump it if present.
   if (isMP3File(trackname)) {
-    currentTrack.seek(mp3_ID3Jumper(currentTrack));
+    currentTrack.seek(max((uint32_t) mp3_ID3Jumper(currentTrack), pos));
+  } else {
+    currentTrack.seek(pos);
   }
 
   // don't let the IRQ get triggered by accident here
@@ -259,6 +261,13 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   interrupts();
 
   return true;
+}
+
+uint32_t Adafruit_VS1053_FilePlayer::getFilePosition() {
+  if (currentTrack)
+    return currentTrack.position();
+  else
+    return 0;
 }
 
 void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
