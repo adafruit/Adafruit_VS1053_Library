@@ -179,8 +179,9 @@ class Adafruit_VS1053_FilePlayer : public Adafruit_VS1053 {
   void feedBuffer(void);
   static boolean isMP3File(const char* fileName);
   unsigned long mp3_ID3Jumper(File mp3);
-  boolean startPlayingFile(const char *trackname);
+  boolean startPlayingFile(const char *trackname, uint32_t pos = 0);
   boolean playFullFile(const char *trackname);
+  uint32_t getFilePosition();	
   void stopPlaying(void);
   boolean paused(void);
   boolean stopped(void);
