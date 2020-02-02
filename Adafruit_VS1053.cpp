@@ -155,10 +155,8 @@ void Adafruit_VS1053_FilePlayer::stopPlaying(void) {
 }
 
 void Adafruit_VS1053_FilePlayer::pausePlaying(boolean pause) {
-  if (pause) 
-    playingMusic = false;
-  else {
-    playingMusic = true;
+  playingMusic = (!pause && currentTrack);
+  if (playingMusic) {
     feedBuffer();
   }
 }
