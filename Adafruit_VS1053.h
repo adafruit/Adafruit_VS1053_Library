@@ -1,14 +1,14 @@
-/*************************************************** 
+/***************************************************
   This is a library for the Adafruit VS1053 Codec Breakout
 
-  Designed specifically to work with the Adafruit VS1053 Codec Breakout 
+  Designed specifically to work with the Adafruit VS1053 Codec Breakout
   ----> https://www.adafruit.com/products/1381
 
-  Adafruit invests time and resources providing this open source code, 
-  please support Adafruit and open-source hardware by purchasing 
+  Adafruit invests time and resources providing this open source code,
+  please support Adafruit and open-source hardware by purchasing
   products from Adafruit!
 
-  Written by Limor Fried/Ladyada for Adafruit Industries.  
+  Written by Limor Fried/Ladyada for Adafruit Industries.
   BSD license, all text above must be included in any redistribution
  ****************************************************/
 #ifndef ADAFRUIT_VS1053_H
@@ -26,7 +26,7 @@
 #include "wiring_private.h"
 #endif
 
-#include <SPI.h> 
+#include <SPI.h>
 #if defined(PREFER_SDFAT_LIBRARY)
  #include <SdFat.h>
  extern SdFat SD;
@@ -38,7 +38,7 @@
 #if defined(ARDUINO_STM32_FEATHER)
   typedef volatile uint32 RwReg;
   typedef uint32_t PortMask;
-#elif defined (__AVR__)
+#elif defined(ARDUINO_ARCH_AVR)
   typedef volatile uint8_t RwReg;
   typedef uint8_t PortMask;
 #elif defined (__arm__)
@@ -110,7 +110,7 @@ typedef volatile RwReg PortReg;
 
 class Adafruit_VS1053 {
  public:
-  Adafruit_VS1053(int8_t mosi, int8_t miso, int8_t clk, 
+  Adafruit_VS1053(int8_t mosi, int8_t miso, int8_t clk,
 		  int8_t rst, int8_t cs, int8_t dcs, int8_t dreq);
   Adafruit_VS1053(int8_t rst, int8_t cs, int8_t dcs, int8_t dreq);
   uint8_t begin(void);
@@ -120,7 +120,7 @@ class Adafruit_VS1053 {
   void sciWrite(uint8_t addr, uint16_t data);
   void sineTest(uint8_t n, uint16_t ms);
   void spiwrite(uint8_t d);
-  void spiwrite(uint8_t *c, uint16_t num); 
+  void spiwrite(uint8_t *c, uint16_t num);
   uint8_t spiread(void);
 
   uint16_t decodeTime(void);
@@ -137,7 +137,7 @@ class Adafruit_VS1053 {
   uint16_t GPIO_digitalRead(void);
   boolean GPIO_digitalRead(uint8_t i);
   void GPIO_pinMode(uint8_t i, uint8_t dir);
- 
+
   boolean prepareRecordOgg(char *plugin);
   void startRecordOgg(boolean mic);
   void stopRecordOgg(void);
@@ -164,7 +164,7 @@ private:
 
 class Adafruit_VS1053_FilePlayer : public Adafruit_VS1053 {
  public:
-  Adafruit_VS1053_FilePlayer (int8_t mosi, int8_t miso, int8_t clk, 
+  Adafruit_VS1053_FilePlayer (int8_t mosi, int8_t miso, int8_t clk,
 			      int8_t rst, int8_t cs, int8_t dcs, int8_t dreq,
 			      int8_t cardCS);
   Adafruit_VS1053_FilePlayer (int8_t rst, int8_t cs, int8_t dcs, int8_t dreq,
