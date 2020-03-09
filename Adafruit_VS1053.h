@@ -14,6 +14,8 @@
 #ifndef ADAFRUIT_VS1053_H
 #define ADAFRUIT_VS1053_H
 
+#define PREFER_SDFAT_LIBRARY
+
 #if (ARDUINO >= 100)
  #include <Arduino.h>
 #else
@@ -29,7 +31,7 @@
 #include <SPI.h>
 #if defined(PREFER_SDFAT_LIBRARY)
  #include <SdFat.h>
- extern SdFat SD;
+//  extern SdFat SD;
 #else
  #include <SD.h>
 #endif
@@ -106,6 +108,7 @@ typedef volatile RwReg PortReg;
 #define VS1053_SCI_AICTRL3 0x0F
 
 #define VS1053_DATABUFFERLEN 32
+#define NUMBER_OF_BUFFERS 8000
 
 
 class Adafruit_VS1053 {
@@ -171,11 +174,12 @@ class Adafruit_VS1053_FilePlayer : public Adafruit_VS1053 {
 			      int8_t cardCS);
   Adafruit_VS1053_FilePlayer (int8_t cs, int8_t dcs, int8_t dreq,
 			      int8_t cardCS);
+  SdFile track;
 
   boolean begin(void);
   boolean useInterrupt(uint8_t type);
-  File currentTrack;
   volatile boolean playingMusic;
+  boolean errorPlaying; 
   void feedBuffer(void);
   static boolean isMP3File(const char* fileName);
   unsigned long mp3_ID3Jumper(File mp3);

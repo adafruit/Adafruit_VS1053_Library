@@ -18,6 +18,8 @@
    #define digitalPinToInterrupt(x) x
 #endif
 
+#define SPI_HAS_TRANSACTION
+
 static Adafruit_VS1053_FilePlayer *myself;
 
 #ifndef _BV
@@ -96,7 +98,7 @@ Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(
 	       int8_t cardcs)
                : Adafruit_VS1053(rst, cs, dcs, dreq) {
 
-  playingMusic = false;
+  playingMusic = errorPlaying = false;
   _cardCS = cardcs;
 }
 
@@ -105,7 +107,7 @@ Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(
 	       int8_t cardcs)
   : Adafruit_VS1053(-1, cs, dcs, dreq) {
 
-  playingMusic = false;
+  playingMusic = errorPlaying = false;
   _cardCS = cardcs;
 }
 
@@ -116,7 +118,7 @@ Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(
 	       int8_t cardcs)
                : Adafruit_VS1053(mosi, miso, clk, rst, cs, dcs, dreq) {
 
-  playingMusic = false;
+  playingMusic = errorPlaying = false;
   _cardCS = cardcs;
 }
 
@@ -146,27 +148,29 @@ boolean Adafruit_VS1053_FilePlayer::playFullFile(const char *trackname) {
 }
 
 void Adafruit_VS1053_FilePlayer::stopPlaying(void) {
+  // pause off
+  pausePlaying(false);
   // cancel all playback
   sciWrite(VS1053_REG_MODE, VS1053_MODE_SM_LINE1 | VS1053_MODE_SM_SDINEW | VS1053_MODE_SM_CANCEL);
 
   // wrap it up!
   playingMusic = false;
-  currentTrack.close();
+  track.close();
 }
 
 void Adafruit_VS1053_FilePlayer::pausePlaying(boolean pause) {
-  playingMusic = (!pause && currentTrack);
+  playingMusic = (!pause &&  track.isOpen());
   if (playingMusic) {
     feedBuffer();
   }
 }
 
 boolean Adafruit_VS1053_FilePlayer::paused(void) {
-  return (!playingMusic && currentTrack);
+  return (!playingMusic && track.isOpen());
 }
 
 boolean Adafruit_VS1053_FilePlayer::stopped(void) {
-  return (!playingMusic && !currentTrack);
+  return (!playingMusic && !track.isOpen());
 }
 
 // Just checks to see if the name ends in ".mp3"
@@ -221,15 +225,14 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   sciWrite(VS1053_REG_WRAMADDR, 0x1e29);
   sciWrite(VS1053_REG_WRAM, 0);
 
-  currentTrack = SD.open(trackname);
-  if (!currentTrack) {
+  if (!track.open(trackname, O_READ)) {
     return false;
   }
 
   // We know we have a valid file. Check if .mp3
   // If so, check for ID3 tag and jump it if present.
   if (isMP3File(trackname)) {
-    currentTrack.seek(mp3_ID3Jumper(currentTrack));
+    track.seek(mp3_ID3Jumper(track));
   }
 
   // don't let the IRQ get triggered by accident here
@@ -240,7 +243,7 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   sciWrite(VS1053_REG_DECODETIME, 0x00);
 
   playingMusic = true;
-
+  errorPlaying = false;
   // wait till its ready for data
   while (! readyForData() ) {
 #if defined(ESP8266)
@@ -256,7 +259,7 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   // ok going forward, we can use the IRQ
   interrupts();
 
-  return true;
+  return !errorPlaying;
 }
 
 void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
@@ -280,20 +283,22 @@ void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
 
 void Adafruit_VS1053_FilePlayer::feedBuffer_noLock(void) {
   if ((! playingMusic) // paused or stopped
-      || (! currentTrack)
+      || (! track.isOpen())
       || (! readyForData())) {
     return; // paused or stopped
   }
-
+  int blocking = 0;
   // Feed the hungry buffer! :)
   while (readyForData()) {
     // Read some audio data from the SD card file
-    int bytesread = currentTrack.read(mp3buffer, VS1053_DATABUFFERLEN);
-
-    if (bytesread == 0) {
+    int bytesread = track.read(mp3buffer, VS1053_DATABUFFERLEN);
+    if (bytesread < 1 || blocking >= NUMBER_OF_BUFFERS) {
       // must be at the end of the file, wrap it up!
       playingMusic = false;
-      currentTrack.close();
+      track.close();
+      stopPlaying();
+      //error playback 
+      if(bytesread == -1 || blocking >= NUMBER_OF_BUFFERS) errorPlaying = true;
       break;
     }
 
@@ -372,11 +377,10 @@ void Adafruit_VS1053::applyPatch(const uint16_t *patch, uint16_t patchsize) {
 
 
 uint16_t Adafruit_VS1053::loadPlugin(char *plugname) {
-
-  File plugin = SD.open(plugname);
-  if (!plugin) {
+  SdFile plugin;
+  plugin.open(plugname, O_READ);
+  if (!plugin.isOpen()) {
     Serial.println("Couldn't open the plugin file");
-    Serial.println(plugin);
     return 0xFFFF;
   }
 
@@ -403,7 +407,7 @@ uint16_t Adafruit_VS1053::loadPlugin(char *plugname) {
     len |= plugin.read() & ~1;
     addr = plugin.read();    addr <<= 8;
     addr |= plugin.read();
-    //Serial.print("len: "); Serial.print(len);
+    //Serial.print("len: "); Serial.print(len); 
     //Serial.print(" addr: $"); Serial.println(addr, HEX);
 
     if (type == 3) {
