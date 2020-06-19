@@ -48,10 +48,10 @@ typedef volatile uint32_t RwReg;
 typedef uint32_t PortMask;
 #else
 typedef volatile uint8_t RwReg; //!< 1-byte read-write register
-typedef uint8_t PortMask;
+typedef uint8_t PortMask; //!< Type definition for a bitmask that is used to specify the bit width
 #endif
 
-typedef volatile RwReg PortReg;
+typedef volatile RwReg PortReg; //!< Type definition/alias used to specify the port register that a pin is in
 
 #define VS1053_FILEPLAYER_TIMER0_INT                                           \
   255 //!< Allows useInterrupt to accept pins 0 to 254
@@ -170,6 +170,8 @@ public:
   void spiwrite(uint8_t d);
   /*!
    * @brief Low-level SPI write operation
+   * @param c Pointer to a buffer containing the data to send
+   * @param num How many elements in the buffer should be sent
    */
   void spiwrite(uint8_t *c, uint16_t num);
   /*!
@@ -214,6 +216,7 @@ public:
   /*!
    * @brief Load the specified plug-in
    * @param fn Plug-in to load
+   * @return Either returns 0xFFFF if there is an error, or the address of the plugin that was loaded
    */
   uint16_t loadPlugin(char *fn);
 
@@ -306,6 +309,7 @@ public:
    * @param cs SCI Chip Select pin
    * @param dcs SDI Chip Select pin
    * @param dreq Data Request pin
+   * @param cardCS CS pin for the SD card on the SPI bus
    */
   Adafruit_VS1053_FilePlayer(int8_t mosi, int8_t miso, int8_t clk, int8_t rst,
                              int8_t cs, int8_t dcs, int8_t dreq, int8_t cardCS);
@@ -316,6 +320,7 @@ public:
    * @param cs SCI Chip Select pin
    * @param dcs SDI Chip Select pin
    * @param dreq Data Request pin
+   * @param cardCS CS pin for the SD card on the SPI bus
    */
   Adafruit_VS1053_FilePlayer(int8_t rst, int8_t cs, int8_t dcs, int8_t dreq,
                              int8_t cardCS);
@@ -326,6 +331,7 @@ public:
    * @param cs SCI Chip Select pin
    * @param dcs SDI Chip Select pin
    * @param dreq Data Request pin
+   * @param cardCS CS pin for the SD card on the SPI bus
    */
   Adafruit_VS1053_FilePlayer(int8_t cs, int8_t dcs, int8_t dreq, int8_t cardCS);
 
@@ -338,10 +344,15 @@ public:
    * @brief Specifies the argument to use for interrupt-driven playback
    * @param type interrupt to use. Valid arguments are
    * VS1053_FILEPLAYER_TIMER0_INT and VS1053_FILEPLAYER_PIN_INT
+   * @return Returs true/false for success/failure
    */
   boolean useInterrupt(uint8_t type);
   File currentTrack;             //!< File that is currently playing
   volatile boolean playingMusic; //!< Whether or not music is playing
+  /*!
+   * @brief Feeds the buffer. Reads mp3 file data from the SD card and file and
+   * puts it into the buffer that the decoder reads from to play a file
+   */
   void feedBuffer(void);
   /*!
    * @brief Checks if the inputted filename is an mp3
@@ -349,6 +360,11 @@ public:
    * @return Returns true or false
    */
   static boolean isMP3File(const char *fileName);
+  /*!
+   * @brief Checks for an ID3 tag at the beginning of the file.
+   * @param mp3 File to read
+   * @return returns the seek position within the file where the mp3 data starts
+   */
   unsigned long mp3_ID3Jumper(File mp3);
   /*!
    * @brief Begin playing the specified file from the SD card using
