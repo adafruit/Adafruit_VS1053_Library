@@ -244,7 +244,7 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   // wait till its ready for data
   while (! readyForData() ) {
 #if defined(ESP8266)
-	yield();
+	ESP.wdtFeed()
 #endif
   }
 
@@ -294,7 +294,44 @@ void Adafruit_VS1053_FilePlayer::feedBuffer_noLock(void) {
       // must be at the end of the file, wrap it up!
       playingMusic = false;
       currentTrack.close();
-      break;
+
+      // Follow the datasheet:
+      // Read extra parameter value endFillByte
+      sciWrite(VS1053_REG_WRAMADDR, VS1053_GPIO_DDR);
+      uint8_t endFillByte = (uint8_t)(sciRead(VS1053_REG_WRAM) & 0xFF);
+      uint8_t endFillBytes[32];
+      memset(endFillBytes, endFillByte, sizeof(endFillBytes));
+      // Send at least 2052 bytes of endFillByte[7:0] (we'll do a few more)
+      for(uint8_t i = 0; i <= 64; i++) {
+        while(!readyForData()) {
+#if defined(ESP8266)
+        	ESP.wdtFeed()
+#endif
+        }
+        playData(endFillBytes, sizeof(endFillBytes));
+      }
+      // Set SCI MODE bit SM CANCEL
+      sciWrite(VS1053_REG_MODE, VS1053_MODE_SM_LINE1 | VS1053_MODE_SM_SDINEW | VS1053_MODE_SM_CANCEL);
+      // Send at least 32 bytes of endFillByte[7:0]
+      // Read SCI MODE. If SM CANCEL is still set, send again. 
+      for(uint8_t i = 0; i <= 64; i++) {
+        while(!readyForData()) {
+#if defined(ESP8266)
+        	ESP.wdtFeed()
+#endif
+        }
+        playData(endFillBytes, sizeof(endFillBytes));
+        if((sciRead(VS1053_REG_MODE) & VS1053_MODE_SM_CANCEL) == 0) {
+          return;
+        }
+      }
+
+      // If SM CANCEL hasn’t cleared after sending 2048 bytes, do a 
+      // software reset (this should be extremely rare)
+      Serial.println("Cancel after playback failed");
+      softReset();
+
+      return;
     }
 
     playData(mp3buffer, bytesread);
