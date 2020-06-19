@@ -48,10 +48,12 @@ typedef volatile uint32_t RwReg;
 typedef uint32_t PortMask;
 #else
 typedef volatile uint8_t RwReg; //!< 1-byte read-write register
-typedef uint8_t PortMask; //!< Type definition for a bitmask that is used to specify the bit width
+typedef uint8_t PortMask; //!< Type definition for a bitmask that is used to
+                          //!< specify the bit width
 #endif
 
-typedef volatile RwReg PortReg; //!< Type definition/alias used to specify the port register that a pin is in
+typedef volatile RwReg PortReg; //!< Type definition/alias used to specify the
+                                //!< port register that a pin is in
 
 #define VS1053_FILEPLAYER_TIMER0_INT                                           \
   255 //!< Allows useInterrupt to accept pins 0 to 254
@@ -216,7 +218,8 @@ public:
   /*!
    * @brief Load the specified plug-in
    * @param fn Plug-in to load
-   * @return Either returns 0xFFFF if there is an error, or the address of the plugin that was loaded
+   * @return Either returns 0xFFFF if there is an error, or the address of the
+   * plugin that was loaded
    */
   uint16_t loadPlugin(char *fn);
 
