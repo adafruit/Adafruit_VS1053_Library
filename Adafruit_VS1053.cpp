@@ -255,7 +255,7 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   // wait till its ready for data
   while (!readyForData()) {
 #if defined(ESP8266)
-    yield();
+    ESP.wdtFeed();
 #endif
   }
 
