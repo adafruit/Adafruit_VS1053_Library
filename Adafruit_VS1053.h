@@ -107,6 +107,8 @@ typedef volatile RwReg PortReg; //!< Type definition/alias used to specify the
 #define VS1053_SCI_AICTRL3                                                     \
   0x0F //!< SCI_AICTRL register 3. Used to access the user's application program
 
+#define VS1053_PARA_PLAYSPEED 0x1E04
+
 #define VS1053_DATABUFFERLEN 32 //!< Length of the data buffer
 
 /*!
