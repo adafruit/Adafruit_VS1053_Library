@@ -106,6 +106,8 @@ typedef volatile RwReg PortReg; //!< Type definition/alias used to specify the
   0x0E //!< SCI_AICTRL register 2. Used to access the user's application program
 #define VS1053_SCI_AICTRL3                                                     \
   0x0F //!< SCI_AICTRL register 3. Used to access the user's application program
+#define VS1053_SCI_WRAM 0x06
+#define VS1053_SCI_WRAMADDR 0x07
 
 #define VS1053_PARA_PLAYSPEED 0x1E04
 
@@ -401,6 +403,16 @@ public:
    * @param pause whether or not to pause playback
    */
   void pausePlaying(boolean pause);
+  /*!
+   * @brief Determine current playback speed
+   * @return Returns playback speed, i.e. 1 for 1x, 2 for 2x, 3 for 3x
+   */
+  uint16_t getPlaySpeed();
+  /*!
+   * @brief Set playback speed
+   * @param speed Set playback speed, i.e. 1 for 1x, 2 for 2x, 3 for 3x
+   */
+  void setPlaySpeed(uint16_t speed);
 
 private:
   void feedBuffer_noLock(void);
