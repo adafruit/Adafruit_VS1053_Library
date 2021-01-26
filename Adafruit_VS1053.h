@@ -109,7 +109,7 @@ typedef volatile RwReg PortReg; //!< Type definition/alias used to specify the
 #define VS1053_SCI_WRAM 0x06     //!< RAM write/read
 #define VS1053_SCI_WRAMADDR 0x07 //!< Base address for RAM write/read
 
-#define VS1053_PARA_PLAYSPEED 0x1E04 //<! 0,1 = normal speed, 2 = 2x, 3 = 3x etc
+#define VS1053_PARA_PLAYSPEED 0x1E04 //!< 0,1 = normal speed, 2 = 2x, 3 = 3x etc
 
 #define VS1053_DATABUFFERLEN 32 //!< Length of the data buffer
 
