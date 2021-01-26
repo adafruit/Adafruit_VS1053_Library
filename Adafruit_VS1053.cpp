@@ -317,8 +317,8 @@ uint16_t Adafruit_VS1053_FilePlayer::getPlaySpeed() {
   noInterrupts();
   sciWrite(VS1053_SCI_WRAMADDR, VS1053_PARA_PLAYSPEED);
   uint16_t speed = sciRead(VS1053_SCI_WRAM);
-  return speed;
   interrupts();
+  return speed;
 }
 
 // set playback speed: 0 or 1 for normal speed, 2 for 2x, 3 for 3x, etc.
