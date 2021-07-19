@@ -350,8 +350,7 @@ public:
    * @return Returs true/false for success/failure
    */
   boolean useInterrupt(uint8_t type);
-  File currentTrack;             //!< File that is currently playing
-  volatile boolean playingMusic; //!< Whether or not music is playing
+
   /*!
    * @brief Feeds the buffer. Reads mp3 file data from the SD card and file and
    * puts it into the buffer that the decoder reads from to play a file
@@ -400,10 +399,24 @@ public:
    */
   void pausePlaying(boolean pause);
 
+  /*!
+   * @brief enables playing in endless loop
+   */
+  void enablePlaybackLooping();
+
+  /*!
+   * @brief disables playing in endless loop
+   */
+  void disablePlaybackLooping();
+
+  File currentTrack;             //!< File that is currently playing
+  volatile boolean playingMusic; //!< Whether or not music is playing
+
 private:
   void feedBuffer_noLock(void);
 
   uint8_t _cardCS;
+  bool _loopPlayback;
 };
 
 #endif // ADAFRUIT_VS1053_H

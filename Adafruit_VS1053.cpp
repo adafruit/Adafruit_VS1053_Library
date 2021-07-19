@@ -107,6 +107,7 @@ Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(int8_t rst, int8_t cs,
 
   playingMusic = false;
   _cardCS = cardcs;
+  _loopPlayback = false;
 }
 
 Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(int8_t cs, int8_t dcs,
@@ -116,6 +117,7 @@ Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(int8_t cs, int8_t dcs,
 
   playingMusic = false;
   _cardCS = cardcs;
+  _loopPlayback = false;
 }
 
 Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(int8_t mosi, int8_t miso,
@@ -127,6 +129,7 @@ Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(int8_t mosi, int8_t miso,
 
   playingMusic = false;
   _cardCS = cardcs;
+  _loopPlayback = false;
 }
 
 boolean Adafruit_VS1053_FilePlayer::begin(void) {
@@ -302,10 +305,20 @@ void Adafruit_VS1053_FilePlayer::feedBuffer_noLock(void) {
     int bytesread = currentTrack.read(mp3buffer, VS1053_DATABUFFERLEN);
 
     if (bytesread == 0) {
-      // must be at the end of the file, wrap it up!
-      playingMusic = false;
-      currentTrack.close();
-      break;
+      // must be at the end of the file
+      if (_loopPlayback) {
+        // play in loop
+        if (isMP3File(currentTrack.name())) {
+          currentTrack.seek(mp3_ID3Jumper(currentTrack));
+        } else {
+          currentTrack.seek(0);
+        }
+      } else {
+        // wrap it up!
+        playingMusic = false;
+        currentTrack.close();
+        break;
+      }
     }
 
     playData(mp3buffer, bytesread);
@@ -809,4 +822,12 @@ void Adafruit_VS1053::sineTest(uint8_t n, uint16_t ms) {
   if (useHardwareSPI)
     SPI.endTransaction();
 #endif
+}
+
+void Adafruit_VS1053_FilePlayer::enablePlaybackLooping() {
+  _loopPlayback = true;
+}
+
+void Adafruit_VS1053_FilePlayer::disablePlaybackLooping() {
+  _loopPlayback = false;
 }
