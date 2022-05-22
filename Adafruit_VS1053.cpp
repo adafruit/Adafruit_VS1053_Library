@@ -41,10 +41,25 @@ SIGNAL(TIMER0_COMPA_vect) { myself->feedBuffer(); }
 
 volatile boolean feedBufferLock = false; //!< Locks feeding the buffer
 
+#if defined(ESP32)
+static SemaphoreHandle_t bufferSemaphore;
+
+static void feedTask(void *param) {
+  while (true) {
+    xSemaphoreTake(bufferSemaphore, portMAX_DELAY);
+    myself->feedBuffer();
+  }
+}
+
+static void IRAM_ATTR feeder(void) {
+  xSemaphoreGiveFromISR(bufferSemaphore, NULL);
+}
+#else
 #if defined(ESP8266)
 ICACHE_RAM_ATTR
 #endif
 static void feeder(void) { myself->feedBuffer(); }
+#endif
 
 #define VS1053_CONTROL_SPI_SETTING                                             \
   SPISettings(250000, MSBFIRST, SPI_MODE0) //!< VS1053 SPI control settings
@@ -86,6 +101,11 @@ boolean Adafruit_VS1053_FilePlayer::useInterrupt(uint8_t type) {
 #endif
   }
   if (type == VS1053_FILEPLAYER_PIN_INT) {
+#if defined(ESP32)
+    bufferSemaphore = xSemaphoreCreateBinary();
+    xTaskCreatePinnedToCore(feedTask, "VS1053Feeder", 1536, NULL, 10, NULL, 0); // Arduino main loop is on core 1, so process on the 'other' core
+#endif
+
     int8_t irq = digitalPinToInterrupt(_dreq);
     // Serial.print("Using IRQ "); Serial.println(irq);
     if (irq == -1)
