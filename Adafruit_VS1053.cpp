@@ -46,11 +46,6 @@ ICACHE_RAM_ATTR
 #endif
 static void feeder(void) { myself->feedBuffer(); }
 
-#define VS1053_CONTROL_SPI_SETTING                                             \
-  SPISettings(250000, MSBFIRST, SPI_MODE0) //!< VS1053 SPI control settings
-#define VS1053_DATA_SPI_SETTING                                                \
-  SPISettings(8000000, MSBFIRST, SPI_MODE0) //!< VS1053 SPI data settings
-
 boolean Adafruit_VS1053_FilePlayer::useInterrupt(uint8_t type) {
   myself = this; // oy vey
 
@@ -441,19 +436,7 @@ uint16_t Adafruit_VS1053::loadPlugin(char *plugname) {
 boolean Adafruit_VS1053::readyForData(void) { return digitalRead(_dreq); }
 
 void Adafruit_VS1053::playData(uint8_t *buffer, uint8_t buffsiz) {
-#ifdef SPI_HAS_TRANSACTION
-  if (useHardwareSPI)
-    SPI.beginTransaction(VS1053_DATA_SPI_SETTING);
-#endif
-  digitalWrite(_dcs, LOW);
-
-  spiwrite(buffer, buffsiz);
-
-  digitalWrite(_dcs, HIGH);
-#ifdef SPI_HAS_TRANSACTION
-  if (useHardwareSPI)
-    SPI.endTransaction();
-#endif
+  spi_dev_data->write(buffer, buffsiz);
 }
 
 void Adafruit_VS1053::setVolume(uint8_t left, uint8_t right) {
@@ -489,8 +472,7 @@ void Adafruit_VS1053::reset() {
     delay(100);
     digitalWrite(_reset, HIGH);
   }
-  digitalWrite(_cs, HIGH);
-  digitalWrite(_dcs, HIGH);
+
   delay(100);
   softReset();
   delay(100);
@@ -506,24 +488,21 @@ uint8_t Adafruit_VS1053::begin(void) {
     digitalWrite(_reset, LOW);
   }
 
-  pinMode(_cs, OUTPUT);
-  digitalWrite(_cs, HIGH);
-  pinMode(_dcs, OUTPUT);
-  digitalWrite(_dcs, HIGH);
   pinMode(_dreq, INPUT);
 
-  if (!useHardwareSPI) {
-    pinMode(_mosi, OUTPUT);
-    pinMode(_clk, OUTPUT);
-    pinMode(_miso, INPUT);
+  if (useHardwareSPI) {
+    spi_dev_ctrl = new Adafruit_SPIDevice(_cs, 250000, SPI_BITORDER_MSBFIRST,
+                                          SPI_MODE0, &SPI);
+    spi_dev_data = new Adafruit_SPIDevice(_dcs, 8000000, SPI_BITORDER_MSBFIRST,
+                                          SPI_MODE0, &SPI);
   } else {
-    SPI.begin();
-#ifndef SPI_HAS_TRANSACTION
-    SPI.setDataMode(SPI_MODE0);
-    SPI.setBitOrder(MSBFIRST);
-    SPI.setClockDivider(SPI_CLOCK_DIV128);
-#endif
+    spi_dev_ctrl = new Adafruit_SPIDevice(_cs, _clk, _miso, _mosi, 250000,
+                                          SPI_BITORDER_MSBFIRST, SPI_MODE0);
+    spi_dev_data = new Adafruit_SPIDevice(_dcs, _clk, _miso, _mosi, 8000000,
+                                          SPI_BITORDER_MSBFIRST, SPI_MODE0);
   }
+  spi_dev_ctrl->begin();
+  spi_dev_data->begin();
 
   reset();
 
@@ -657,106 +636,15 @@ boolean Adafruit_VS1053::GPIO_digitalRead(uint8_t i) {
 }
 
 uint16_t Adafruit_VS1053::sciRead(uint8_t addr) {
-  uint16_t data;
-
-#ifdef SPI_HAS_TRANSACTION
-  if (useHardwareSPI)
-    SPI.beginTransaction(VS1053_CONTROL_SPI_SETTING);
-#endif
-  digitalWrite(_cs, LOW);
-  spiwrite(VS1053_SCI_READ);
-  spiwrite(addr);
-  delayMicroseconds(10);
-  data = spiread();
-  data <<= 8;
-  data |= spiread();
-  digitalWrite(_cs, HIGH);
-#ifdef SPI_HAS_TRANSACTION
-  if (useHardwareSPI)
-    SPI.endTransaction();
-#endif
-
-  return data;
+  uint8_t buffer[2] = {VS1053_SCI_READ, addr};
+  spi_dev_ctrl->write_then_read(buffer, 2, buffer, 2);
+  return (uint16_t(buffer[0]) << 8) | uint16_t(buffer[1]);
 }
 
 void Adafruit_VS1053::sciWrite(uint8_t addr, uint16_t data) {
-#ifdef SPI_HAS_TRANSACTION
-  if (useHardwareSPI)
-    SPI.beginTransaction(VS1053_CONTROL_SPI_SETTING);
-#endif
-  digitalWrite(_cs, LOW);
-  spiwrite(VS1053_SCI_WRITE);
-  spiwrite(addr);
-  spiwrite(data >> 8);
-  spiwrite(data & 0xFF);
-  digitalWrite(_cs, HIGH);
-#ifdef SPI_HAS_TRANSACTION
-  if (useHardwareSPI)
-    SPI.endTransaction();
-#endif
-}
-
-uint8_t Adafruit_VS1053::spiread(void) {
-  int8_t i, x;
-  x = 0;
-
-  // MSB first, clock low when inactive (CPOL 0), data valid on leading edge
-  // (CPHA 0) Make sure clock starts low
-
-  if (useHardwareSPI) {
-    x = SPI.transfer(0x00);
-  } else {
-    for (i = 7; i >= 0; i--) {
-      if ((*misoportreg) & misopin)
-        x |= (1 << i);
-      *clkportreg |= clkpin;
-      *clkportreg &= ~clkpin;
-      //    asm("nop; nop");
-    }
-    // Make sure clock ends low
-    *clkportreg &= ~clkpin;
-  }
-  return x;
-}
-
-void Adafruit_VS1053::spiwrite(uint8_t c) {
-
-  uint8_t x __attribute__((aligned(32))) = c;
-  spiwrite(&x, 1);
-}
-
-void Adafruit_VS1053::spiwrite(uint8_t *c, uint16_t num) {
-  // MSB first, clock low when inactive (CPOL 0), data valid on leading edge
-  // (CPHA 0) Make sure clock starts low
-
-  if (useHardwareSPI) {
-
-    //#if defined(ESP32)  // optimized
-    //  SPI.writeBytes(c, num);
-    //  return;
-    //#endif
-
-    while (num--) {
-      SPI.transfer(c[0]);
-      c++;
-    }
-
-  } else {
-    while (num--) {
-      for (int8_t i = 7; i >= 0; i--) {
-        *clkportreg &= ~clkpin;
-        if (c[0] & (1 << i)) {
-          *mosiportreg |= mosipin;
-        } else {
-          *mosiportreg &= ~mosipin;
-        }
-        *clkportreg |= clkpin;
-      }
-      *clkportreg &= ~clkpin; // Make sure clock ends low
-
-      c++;
-    }
-  }
+  uint8_t buffer[4] = {VS1053_SCI_WRITE, addr, uint8_t(data >> 8),
+                       uint8_t(data & 0xFF)};
+  spi_dev_ctrl->write(buffer, 4);
 }
 
 void Adafruit_VS1053::sineTest(uint8_t n, uint16_t ms) {
@@ -768,45 +656,12 @@ void Adafruit_VS1053::sineTest(uint8_t n, uint16_t ms) {
 
   while (!digitalRead(_dreq))
     ;
-    //  delay(10);
+  //  delay(10);
 
-#ifdef SPI_HAS_TRANSACTION
-  if (useHardwareSPI)
-    SPI.beginTransaction(VS1053_DATA_SPI_SETTING);
-#endif
-  digitalWrite(_dcs, LOW);
-  spiwrite(0x53);
-  spiwrite(0xEF);
-  spiwrite(0x6E);
-  spiwrite(n);
-  spiwrite(0x00);
-  spiwrite(0x00);
-  spiwrite(0x00);
-  spiwrite(0x00);
-  digitalWrite(_dcs, HIGH);
-#ifdef SPI_HAS_TRANSACTION
-  if (useHardwareSPI)
-    SPI.endTransaction();
-#endif
+  uint8_t sine_start[8] = {0x53, 0xEF, 0x6E, n, 0x00, 0x00, 0x00, 0x00};
+  uint8_t sine_stop[8] = {0x45, 0x78, 0x69, 0x74, 0x00, 0x00, 0x00, 0x00};
 
+  spi_dev_data->write(sine_start, 8);
   delay(ms);
-
-#ifdef SPI_HAS_TRANSACTION
-  if (useHardwareSPI)
-    SPI.beginTransaction(VS1053_DATA_SPI_SETTING);
-#endif
-  digitalWrite(_dcs, LOW);
-  spiwrite(0x45);
-  spiwrite(0x78);
-  spiwrite(0x69);
-  spiwrite(0x74);
-  spiwrite(0x00);
-  spiwrite(0x00);
-  spiwrite(0x00);
-  spiwrite(0x00);
-  digitalWrite(_dcs, HIGH);
-#ifdef SPI_HAS_TRANSACTION
-  if (useHardwareSPI)
-    SPI.endTransaction();
-#endif
+  spi_dev_data->write(sine_stop, 8);
 }
