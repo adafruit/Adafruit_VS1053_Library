@@ -166,23 +166,6 @@ public:
    * @param ms Delay (in ms)
    */
   void sineTest(uint8_t n, uint16_t ms);
-  // /*!
-  //  * @brief Low-level SPI write operation
-  //  * @param d What to write
-  //  */
-  // void spiwrite(uint8_t d);
-  // /*!
-  //  * @brief Low-level SPI write operation
-  //  * @param c Pointer to a buffer containing the data to send
-  //  * @param num How many elements in the buffer should be sent
-  //  */
-  // void spiwrite(uint8_t *c, uint16_t num);
-  // /*!
-  //  * @brief Low-level SPI read operation
-  //  * @return Returns a byte read from SPI
-  //  */
-  // uint8_t spiread(void);
-
   /*!
    * @brief Reads the DECODETIME register from the chip
    * @return Returns the decode time as an unsigned 16-bit integer
