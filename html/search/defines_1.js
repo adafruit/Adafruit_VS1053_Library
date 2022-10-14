@@ -1,7 +1,5 @@
 var searchData=
 [
-  ['vs1053_5fcontrol_5fspi_5fsetting',['VS1053_CONTROL_SPI_SETTING',['../_adafruit___v_s1053_8cpp.html#a06f1b46ceaab299de3c749029f2d9e27',1,'Adafruit_VS1053.cpp']]],
-  ['vs1053_5fdata_5fspi_5fsetting',['VS1053_DATA_SPI_SETTING',['../_adafruit___v_s1053_8cpp.html#a2fb4415f60d69ba4938ebf5f0ab60346',1,'Adafruit_VS1053.cpp']]],
   ['vs1053_5fdatabufferlen',['VS1053_DATABUFFERLEN',['../_adafruit___v_s1053_8h.html#adcfff94ff72c07f4afd77343ca237bf6',1,'Adafruit_VS1053.h']]],
   ['vs1053_5ffileplayer_5fpin_5fint',['VS1053_FILEPLAYER_PIN_INT',['../_adafruit___v_s1053_8h.html#a7a91270ad469f662c4fd5017fb791fbc',1,'Adafruit_VS1053.h']]],
   ['vs1053_5ffileplayer_5ftimer0_5fint',['VS1053_FILEPLAYER_TIMER0_INT',['../_adafruit___v_s1053_8h.html#a646171629f22183a9b5e95bf204b07b2',1,'Adafruit_VS1053.h']]],
