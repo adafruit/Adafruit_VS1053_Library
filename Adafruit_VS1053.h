@@ -17,7 +17,8 @@
 #include "wiring_private.h"
 #endif
 
-#include <SPI.h>
+#include <Adafruit_SPIDevice.h>
+
 #if defined(PREFER_SDFAT_LIBRARY)
 #include <SdFat.h>
 extern SdFat SD;
@@ -166,23 +167,6 @@ public:
    */
   void sineTest(uint8_t n, uint16_t ms);
   /*!
-   * @brief Low-level SPI write operation
-   * @param d What to write
-   */
-  void spiwrite(uint8_t d);
-  /*!
-   * @brief Low-level SPI write operation
-   * @param c Pointer to a buffer containing the data to send
-   * @param num How many elements in the buffer should be sent
-   */
-  void spiwrite(uint8_t *c, uint16_t num);
-  /*!
-   * @brief Low-level SPI read operation
-   * @return Returns a byte read from SPI
-   */
-  uint8_t spiread(void);
-
-  /*!
    * @brief Reads the DECODETIME register from the chip
    * @return Returns the decode time as an unsigned 16-bit integer
    */
@@ -286,12 +270,16 @@ protected:
   uint32_t _dreq;
 
 private:
+  Adafruit_SPIDevice *spi_dev_ctrl = NULL; ///< Pointer to SPI dev for control
+  Adafruit_SPIDevice *spi_dev_data = NULL; ///< Pointer to SPI dev for data
   int32_t _mosi, _miso, _clk, _reset, _cs, _dcs;
   boolean useHardwareSPI;
 #else
 protected:
   uint8_t _dreq; //!< Data request pin
 private:
+  Adafruit_SPIDevice *spi_dev_ctrl = NULL; ///< Pointer to SPI dev for control
+  Adafruit_SPIDevice *spi_dev_data = NULL; ///< Pointer to SPI dev for data
   int8_t _mosi, _miso, _clk, _reset, _cs, _dcs;
   boolean useHardwareSPI;
 #endif
