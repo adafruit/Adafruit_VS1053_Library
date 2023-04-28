@@ -310,7 +310,12 @@ void Adafruit_VS1053_FilePlayer::feedBuffer_noLock(void) {
       // must be at the end of the file
       if (_loopPlayback) {
         // play in loop
+#if defined(USE_SDFAT_FAT32)
+        char fileName[32];
+        if (currentTrack.getName(fileName, 32) && isMP3File(fileName)) {
+#else
         if (isMP3File(currentTrack.name())) {
+#endif
           currentTrack.seek(mp3_ID3Jumper(currentTrack));
         } else {
           currentTrack.seek(0);
