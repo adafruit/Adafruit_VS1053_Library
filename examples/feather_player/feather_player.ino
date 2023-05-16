@@ -16,7 +16,7 @@
   #define VS1053_DREQ     0     // VS1053 Data request, ideally an Interrupt pin
 
 // Feather ESP32
-#elif defined(ESP32)
+#elif defined(ESP32) && !defined(ARDUINO_ADAFRUIT_FEATHER_ESP32S2)
   #define VS1053_CS      32     // VS1053 chip select pin (output)
   #define VS1053_DCS     33     // VS1053 Data/command select pin (output)
   #define CARDCS         14     // Card chip select pin
@@ -42,7 +42,7 @@
   #define CARDCS          27     // Card chip select pin
   #define VS1053_DREQ     31     // VS1053 Data request, ideally an Interrupt pin
 
-// Feather M4, M0, 328, nRF52840 or 32u4
+// Feather M4, M0, 328, ESP32S2, nRF52840 or 32u4
 #else
   #define VS1053_CS       6     // VS1053 chip select pin (output)
   #define VS1053_DCS     10     // VS1053 Data/command select pin (output)
