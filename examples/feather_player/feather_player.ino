@@ -42,6 +42,13 @@
   #define CARDCS          27     // Card chip select pin
   #define VS1053_DREQ     31     // VS1053 Data request, ideally an Interrupt pin
 
+// Feather RP2040
+#elif defined(ARDUINO_ADAFRUIT_FEATHER_RP2040)
+  #define VS1053_CS       8     // VS1053 chip select pin (output)
+  #define VS1053_DCS     10     // VS1053 Data/command select pin (output)
+  #define CARDCS          7     // Card chip select pin
+  #define VS1053_DREQ     9     // VS1053 Data request, ideally an Interrupt pin
+
 // Feather M4, M0, 328, ESP32S2, nRF52840 or 32u4
 #else
   #define VS1053_CS       6     // VS1053 chip select pin (output)
@@ -53,7 +60,7 @@
 #endif
 
 
-Adafruit_VS1053_FilePlayer musicPlayer = 
+Adafruit_VS1053_FilePlayer musicPlayer =
   Adafruit_VS1053_FilePlayer(VS1053_RESET, VS1053_CS, VS1053_DCS, VS1053_DREQ, CARDCS);
 
 void setup() {
@@ -66,29 +73,29 @@ void setup() {
   while (!Serial) { delay(1); }
   delay(500);
   Serial.println("\n\nAdafruit VS1053 Feather Test");
-  
+
   if (! musicPlayer.begin()) { // initialise the music player
      Serial.println(F("Couldn't find VS1053, do you have the right pins defined?"));
      while (1);
   }
 
   Serial.println(F("VS1053 found"));
- 
+
   musicPlayer.sineTest(0x44, 500);    // Make a tone to indicate VS1053 is working
-  
+
   if (!SD.begin(CARDCS)) {
     Serial.println(F("SD failed, or not present"));
     while (1);  // don't do anything more
   }
   Serial.println("SD OK!");
-  
+
   // list files
   printDirectory(SD.open("/"), 0);
-  
+
   // Set volume for left, right channels. lower numbers == louder volume!
   musicPlayer.setVolume(10,10);
-  
-#if defined(__AVR_ATmega32U4__) 
+
+#if defined(__AVR_ATmega32U4__)
   // Timer interrupts are not suggested, better to use DREQ interrupt!
   // but we don't have them on the 32u4 feather...
   musicPlayer.useInterrupt(VS1053_FILEPLAYER_TIMER0_INT); // timer int
@@ -97,7 +104,7 @@ void setup() {
   // audio playing
   musicPlayer.useInterrupt(VS1053_FILEPLAYER_PIN_INT);  // DREQ int
 #endif
-  
+
   // Play a file in the background, REQUIRES interrupts!
   Serial.println(F("Playing full track 001"));
   musicPlayer.playFullFile("/track001.mp3");
@@ -117,18 +124,18 @@ void loop() {
   }
   if (Serial.available()) {
     char c = Serial.read();
-    
+
     // if we get an 's' on the serial console, stop!
     if (c == 's') {
       musicPlayer.stopPlaying();
     }
-    
+
     // if we get an 'p' on the serial console, pause/unpause!
     if (c == 'p') {
       if (! musicPlayer.paused()) {
         Serial.println("Paused");
         musicPlayer.pausePlaying(true);
-      } else { 
+      } else {
         Serial.println("Resumed");
         musicPlayer.pausePlaying(false);
       }
@@ -142,7 +149,7 @@ void loop() {
 /// File listing helper
 void printDirectory(File dir, int numTabs) {
    while(true) {
-     
+
      File entry =  dir.openNextFile();
      if (! entry) {
        // no more files
