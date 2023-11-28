@@ -18,6 +18,7 @@ var searchData=
   ['vs1053_5fmode_5fsm_5fsdinew',['VS1053_MODE_SM_SDINEW',['../_adafruit___v_s1053_8h.html#ab0799a644c1cc05ff59570f74bc6522b',1,'Adafruit_VS1053.h']]],
   ['vs1053_5fmode_5fsm_5fstream',['VS1053_MODE_SM_STREAM',['../_adafruit___v_s1053_8h.html#a5dbf7557fc110fb1ffc75f79bfd7fcc3',1,'Adafruit_VS1053.h']]],
   ['vs1053_5fmode_5fsm_5ftests',['VS1053_MODE_SM_TESTS',['../_adafruit___v_s1053_8h.html#a4f3091b665886ec778114b6fcae46719',1,'Adafruit_VS1053.h']]],
+  ['vs1053_5fpara_5fplayspeed',['VS1053_PARA_PLAYSPEED',['../_adafruit___v_s1053_8h.html#a9901a2722a3c54a6253a4728472f3ecf',1,'Adafruit_VS1053.h']]],
   ['vs1053_5freg_5faudata',['VS1053_REG_AUDATA',['../_adafruit___v_s1053_8h.html#aac366532fda6e154ea887c458a54c94c',1,'Adafruit_VS1053.h']]],
   ['vs1053_5freg_5fbass',['VS1053_REG_BASS',['../_adafruit___v_s1053_8h.html#a69a618120a4f84fe9c5edafd5dce8413',1,'Adafruit_VS1053.h']]],
   ['vs1053_5freg_5fclockf',['VS1053_REG_CLOCKF',['../_adafruit___v_s1053_8h.html#a1d4da5c4063e36e32f639b28d3b0118d',1,'Adafruit_VS1053.h']]],
@@ -35,5 +36,7 @@ var searchData=
   ['vs1053_5fsci_5faictrl2',['VS1053_SCI_AICTRL2',['../_adafruit___v_s1053_8h.html#a3cbb361e6eff94b34f308de4770cc084',1,'Adafruit_VS1053.h']]],
   ['vs1053_5fsci_5faictrl3',['VS1053_SCI_AICTRL3',['../_adafruit___v_s1053_8h.html#a7c81cc3080565b299c7c0fc599fd4561',1,'Adafruit_VS1053.h']]],
   ['vs1053_5fsci_5fread',['VS1053_SCI_READ',['../_adafruit___v_s1053_8h.html#a5cfa57523fc32997da799d00da088952',1,'Adafruit_VS1053.h']]],
+  ['vs1053_5fsci_5fwram',['VS1053_SCI_WRAM',['../_adafruit___v_s1053_8h.html#a7d2a9d9e566f2a0a35a840f538f33afe',1,'Adafruit_VS1053.h']]],
+  ['vs1053_5fsci_5fwramaddr',['VS1053_SCI_WRAMADDR',['../_adafruit___v_s1053_8h.html#a9e97b0f41e21114afac4c93d8f883cd4',1,'Adafruit_VS1053.h']]],
   ['vs1053_5fsci_5fwrite',['VS1053_SCI_WRITE',['../_adafruit___v_s1053_8h.html#a4c0db37910a047f6bc819a4938fe52e6',1,'Adafruit_VS1053.h']]]
 ];

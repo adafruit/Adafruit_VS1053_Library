@@ -2,6 +2,7 @@ var searchData=
 [
   ['sciread',['sciRead',['../class_adafruit___v_s1053.html#adb7646c7dd1466b609aa5cc6ecfdf4e1',1,'Adafruit_VS1053']]],
   ['sciwrite',['sciWrite',['../class_adafruit___v_s1053.html#a5fc39cbdd59b7616c9fd8233f7f9719b',1,'Adafruit_VS1053']]],
+  ['setplayspeed',['setPlaySpeed',['../class_adafruit___v_s1053___file_player.html#a20ce15b5df4fb6c1a7f45ec3d8725ccd',1,'Adafruit_VS1053_FilePlayer']]],
   ['setvolume',['setVolume',['../class_adafruit___v_s1053.html#a3e099e0431f19b6132bd217235dc1e69',1,'Adafruit_VS1053']]],
   ['sinetest',['sineTest',['../class_adafruit___v_s1053.html#aa048cdd2b9e5570fb885d6c8928911bc',1,'Adafruit_VS1053']]],
   ['softreset',['softReset',['../class_adafruit___v_s1053.html#a6ba4af757b3bcf15e809143943308d00',1,'Adafruit_VS1053']]],

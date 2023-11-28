@@ -125,6 +125,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a978476430392aab25111e58bdbf615f5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___v_s1053___file_player.html#a978476430392aab25111e58bdbf615f5">pausePlaying</a> (boolean pause)</td></tr>
 <tr class="memdesc:a978476430392aab25111e58bdbf615f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pause playback.  <a href="#a978476430392aab25111e58bdbf615f5">More...</a><br /></td></tr>
 <tr class="separator:a978476430392aab25111e58bdbf615f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c93e456684c9cee84f709d73523bf1c"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___v_s1053___file_player.html#a3c93e456684c9cee84f709d73523bf1c">getPlaySpeed</a> ()</td></tr>
+<tr class="memdesc:a3c93e456684c9cee84f709d73523bf1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine current playback speed.  <a href="#a3c93e456684c9cee84f709d73523bf1c">More...</a><br /></td></tr>
+<tr class="separator:a3c93e456684c9cee84f709d73523bf1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a20ce15b5df4fb6c1a7f45ec3d8725ccd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___v_s1053___file_player.html#a20ce15b5df4fb6c1a7f45ec3d8725ccd">setPlaySpeed</a> (uint16_t speed)</td></tr>
+<tr class="memdesc:a20ce15b5df4fb6c1a7f45ec3d8725ccd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set playback speed.  <a href="#a20ce15b5df4fb6c1a7f45ec3d8725ccd">More...</a><br /></td></tr>
+<tr class="separator:a20ce15b5df4fb6c1a7f45ec3d8725ccd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_class_adafruit___v_s1053"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_class_adafruit___v_s1053')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="class_adafruit___v_s1053.html">Adafruit_VS1053</a></td></tr>
 <tr class="memitem:a36bb86400c7d697aadee53789e411ee9 inherit pub_methods_class_adafruit___v_s1053"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___v_s1053.html#a36bb86400c7d697aadee53789e411ee9">Adafruit_VS1053</a> (int8_t mosi, int8_t miso, int8_t clk, int8_t rst, int8_t cs, int8_t dcs, int8_t dreq)</td></tr>
 <tr class="memdesc:a36bb86400c7d697aadee53789e411ee9 inherit pub_methods_class_adafruit___v_s1053"><td class="mdescLeft">&#160;</td><td class="mdescRight">Software SPI constructor - must specify all pins.  <a href="class_adafruit___v_s1053.html#a36bb86400c7d697aadee53789e411ee9">More...</a><br /></td></tr>
@@ -652,6 +658,52 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">pause</td><td>whether or not to pause playback </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a3c93e456684c9cee84f709d73523bf1c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3c93e456684c9cee84f709d73523bf1c">&#9670;&nbsp;</a></span>getPlaySpeed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">uint16_t Adafruit_VS1053_FilePlayer::getPlaySpeed </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Determine current playback speed. </p>
+<dl class="section return"><dt>Returns</dt><dd>Returns playback speed, i.e. 1 for 1x, 2 for 2x, 3 for 3x </dd></dl>
+
+</div>
+</div>
+<a id="a20ce15b5df4fb6c1a7f45ec3d8725ccd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20ce15b5df4fb6c1a7f45ec3d8725ccd">&#9670;&nbsp;</a></span>setPlaySpeed()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Adafruit_VS1053_FilePlayer::setPlaySpeed </td>
+          <td>(</td>
+          <td class="paramtype">uint16_t&#160;</td>
+          <td class="paramname"><em>speed</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set playback speed. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">speed</td><td>Set playback speed, i.e. 1 for 1x, 2 for 2x, 3 for 3x </td></tr>
   </table>
   </dd>
 </dl>
