@@ -307,6 +307,23 @@ void Adafruit_VS1053_FilePlayer::feedBuffer_noLock(void) {
   }
 }
 
+// get current playback speed. 0 or 1 indicates normal speed
+uint16_t Adafruit_VS1053_FilePlayer::getPlaySpeed() {
+  noInterrupts();
+  sciWrite(VS1053_SCI_WRAMADDR, VS1053_PARA_PLAYSPEED);
+  uint16_t speed = sciRead(VS1053_SCI_WRAM);
+  interrupts();
+  return speed;
+}
+
+// set playback speed: 0 or 1 for normal speed, 2 for 2x, 3 for 3x, etc.
+void Adafruit_VS1053_FilePlayer::setPlaySpeed(uint16_t speed) {
+  noInterrupts();
+  sciWrite(VS1053_SCI_WRAMADDR, VS1053_PARA_PLAYSPEED);
+  sciWrite(VS1053_SCI_WRAM, speed);
+  interrupts();
+}
+
 /***************************************************************/
 
 /* VS1053 'low level' interface */
