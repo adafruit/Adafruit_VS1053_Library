@@ -387,6 +387,16 @@ public:
    * @param pause whether or not to pause playback
    */
   void pausePlaying(boolean pause);
+  /*!
+   * @brief Set state for playback looping
+   * @param loopState Sets playback loop state (Note: Only use with startPlayingFile, if used with playFullFile no subsequent code in the sketch executes)
+   */
+  void playbackLoop(boolean loopState);
+  /*!
+   * @brief Retrieve playback loop state
+   * @return Returns true when looped playback is enabled
+   */
+  boolean playbackLooped();
 
 private:
   void feedBuffer_noLock(void);
