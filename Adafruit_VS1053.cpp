@@ -182,7 +182,7 @@ void Adafruit_VS1053_FilePlayer::playbackLoop(boolean loopState) {
   _loopPlayback = loopState;
 }
 
-boolean Adafruit_VS1053_FilePlayer::playbackLooped(){ return _loopPlayback }
+boolean Adafruit_VS1053_FilePlayer::playbackLooped(){ return _loopPlayback; }
 
 // Just checks to see if the name ends in ".mp3"
 boolean Adafruit_VS1053_FilePlayer::isMP3File(const char *fileName) {
