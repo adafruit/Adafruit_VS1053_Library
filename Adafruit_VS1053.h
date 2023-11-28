@@ -403,6 +403,7 @@ public:
    * @return Returns true when looped playback is enabled
    */
   boolean playbackLooped();
+  /*!
    * @brief Determine current playback speed
    * @return Returns playback speed, i.e. 1 for 1x, 2 for 2x, 3 for 3x
    */
