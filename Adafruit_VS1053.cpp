@@ -103,7 +103,7 @@ Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(int8_t rst, int8_t cs,
 
   playingMusic = false;
   _cardCS = cardcs;
-  _loopPlayback = false; 
+  _loopPlayback = false;
 }
 
 Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(int8_t cs, int8_t dcs,
