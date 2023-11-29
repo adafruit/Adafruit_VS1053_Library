@@ -125,6 +125,12 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memitem:a978476430392aab25111e58bdbf615f5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___v_s1053___file_player.html#a978476430392aab25111e58bdbf615f5">pausePlaying</a> (boolean pause)</td></tr>
 <tr class="memdesc:a978476430392aab25111e58bdbf615f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Pause playback.  <a href="#a978476430392aab25111e58bdbf615f5">More...</a><br /></td></tr>
 <tr class="separator:a978476430392aab25111e58bdbf615f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d107ea4633d51c72b680f8e184af9b8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___v_s1053___file_player.html#a1d107ea4633d51c72b680f8e184af9b8">playbackLoop</a> (boolean loopState)</td></tr>
+<tr class="memdesc:a1d107ea4633d51c72b680f8e184af9b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set state for playback looping.  <a href="#a1d107ea4633d51c72b680f8e184af9b8">More...</a><br /></td></tr>
+<tr class="separator:a1d107ea4633d51c72b680f8e184af9b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1326ee3efd356d608f45176c29081bdf"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___v_s1053___file_player.html#a1326ee3efd356d608f45176c29081bdf">playbackLooped</a> ()</td></tr>
+<tr class="memdesc:a1326ee3efd356d608f45176c29081bdf"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve playback loop state.  <a href="#a1326ee3efd356d608f45176c29081bdf">More...</a><br /></td></tr>
+<tr class="separator:a1326ee3efd356d608f45176c29081bdf"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c93e456684c9cee84f709d73523bf1c"><td class="memItemLeft" align="right" valign="top">uint16_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_adafruit___v_s1053___file_player.html#a3c93e456684c9cee84f709d73523bf1c">getPlaySpeed</a> ()</td></tr>
 <tr class="memdesc:a3c93e456684c9cee84f709d73523bf1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Determine current playback speed.  <a href="#a3c93e456684c9cee84f709d73523bf1c">More...</a><br /></td></tr>
 <tr class="separator:a3c93e456684c9cee84f709d73523bf1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -661,6 +667,52 @@ uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
   </table>
   </dd>
 </dl>
+
+</div>
+</div>
+<a id="a1d107ea4633d51c72b680f8e184af9b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d107ea4633d51c72b680f8e184af9b8">&#9670;&nbsp;</a></span>playbackLoop()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Adafruit_VS1053_FilePlayer::playbackLoop </td>
+          <td>(</td>
+          <td class="paramtype">boolean&#160;</td>
+          <td class="paramname"><em>loopState</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Set state for playback looping. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">loopState</td><td>Sets playback loop state (Note: Only use with startPlayingFile, if used with playFullFile no subsequent code in the sketch executes) </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a1326ee3efd356d608f45176c29081bdf"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1326ee3efd356d608f45176c29081bdf">&#9670;&nbsp;</a></span>playbackLooped()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boolean Adafruit_VS1053_FilePlayer::playbackLooped </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Retrieve playback loop state. </p>
+<dl class="section return"><dt>Returns</dt><dd>Returns true when looped playback is enabled </dd></dl>
 
 </div>
 </div>
