@@ -40,7 +40,7 @@ SIGNAL(TIMER0_COMPA_vect) { myself->feedBuffer(); }
 #endif
 
 volatile boolean feedBufferLock = false; //!< Locks feeding the buffer
-boolean _loopPlayback;
+boolean _loopPlayback; //!< internal variable, used to control playback looping 
 
 #if defined(ESP8266)
 ICACHE_RAM_ATTR
@@ -103,7 +103,7 @@ Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(int8_t rst, int8_t cs,
 
   playingMusic = false;
   _cardCS = cardcs;
-  _loopPlayback = false;
+  _loopPlayback = false; 
 }
 
 Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(int8_t cs, int8_t dcs,
