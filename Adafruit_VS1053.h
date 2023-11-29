@@ -392,6 +392,18 @@ public:
    */
   void pausePlaying(boolean pause);
   /*!
+   * @brief Set state for playback looping
+   * @param loopState Sets playback loop state (Note: Only use with
+   * startPlayingFile, if used with playFullFile no subsequent code in the
+   * sketch executes)
+   */
+  void playbackLoop(boolean loopState);
+  /*!
+   * @brief Retrieve playback loop state
+   * @return Returns true when looped playback is enabled
+   */
+  boolean playbackLooped();
+  /*!
    * @brief Determine current playback speed
    * @return Returns playback speed, i.e. 1 for 1x, 2 for 2x, 3 for 3x
    */
