@@ -40,7 +40,7 @@ SIGNAL(TIMER0_COMPA_vect) { myself->feedBuffer(); }
 #endif
 
 volatile boolean feedBufferLock = false; //!< Locks feeding the buffer
-boolean _loopPlayback; //!< internal variable, used to control playback looping 
+boolean _loopPlayback; //!< internal variable, used to control playback looping
 
 #if defined(ESP8266)
 ICACHE_RAM_ATTR
