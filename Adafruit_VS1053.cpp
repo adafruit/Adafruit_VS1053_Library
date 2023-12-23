@@ -362,13 +362,18 @@ Adafruit_VS1053::Adafruit_VS1053(int8_t mosi, int8_t miso, int8_t clk,
   _dreq = dreq;
 
   useHardwareSPI = false;
-
+#if defined(ARDUINO_UNOR4_WIFI)
+  pinMode(_clk, OUTPUT);
+  pinMode(_miso, INPUT);
+  pinMode(_mosi, OUTPUT);
+#else
   clkportreg = portOutputRegister(digitalPinToPort(_clk));
   clkpin = digitalPinToBitMask(_clk);
   misoportreg = portInputRegister(digitalPinToPort(_miso));
   misopin = digitalPinToBitMask(_miso);
   mosiportreg = portOutputRegister(digitalPinToPort(_mosi));
   mosipin = digitalPinToBitMask(_mosi);
+#endif
 }
 
 Adafruit_VS1053::Adafruit_VS1053(int8_t rst, int8_t cs, int8_t dcs,
