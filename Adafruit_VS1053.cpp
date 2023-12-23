@@ -25,7 +25,7 @@
 
 #include <Adafruit_VS1053.h>
 
-#if defined(ARDUINO_STM32_FEATHER) 
+#if defined(ARDUINO_STM32_FEATHER)
 #define digitalPinToInterrupt(x) x
 #endif
 
@@ -40,6 +40,7 @@ SIGNAL(TIMER0_COMPA_vect) { myself->feedBuffer(); }
 #endif
 
 volatile boolean feedBufferLock = false; //!< Locks feeding the buffer
+boolean _loopPlayback; //!< internal variable, used to control playback looping
 
 #if defined(ESP8266)
 ICACHE_RAM_ATTR
@@ -102,6 +103,7 @@ Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(int8_t rst, int8_t cs,
 
   playingMusic = false;
   _cardCS = cardcs;
+  _loopPlayback = false;
 }
 
 Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(int8_t cs, int8_t dcs,
@@ -111,6 +113,7 @@ Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(int8_t cs, int8_t dcs,
 
   playingMusic = false;
   _cardCS = cardcs;
+  _loopPlayback = false;
 }
 
 Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(int8_t mosi, int8_t miso,
@@ -122,6 +125,7 @@ Adafruit_VS1053_FilePlayer::Adafruit_VS1053_FilePlayer(int8_t mosi, int8_t miso,
 
   playingMusic = false;
   _cardCS = cardcs;
+  _loopPlayback = false;
 }
 
 boolean Adafruit_VS1053_FilePlayer::begin(void) {
@@ -173,6 +177,12 @@ boolean Adafruit_VS1053_FilePlayer::paused(void) {
 boolean Adafruit_VS1053_FilePlayer::stopped(void) {
   return (!playingMusic && !currentTrack);
 }
+
+void Adafruit_VS1053_FilePlayer::playbackLoop(boolean loopState) {
+  _loopPlayback = loopState;
+}
+
+boolean Adafruit_VS1053_FilePlayer::playbackLooped() { return _loopPlayback; }
 
 // Just checks to see if the name ends in ".mp3"
 boolean Adafruit_VS1053_FilePlayer::isMP3File(const char *fileName) {
@@ -297,14 +307,41 @@ void Adafruit_VS1053_FilePlayer::feedBuffer_noLock(void) {
     int bytesread = currentTrack.read(mp3buffer, VS1053_DATABUFFERLEN);
 
     if (bytesread == 0) {
-      // must be at the end of the file, wrap it up!
-      playingMusic = false;
-      currentTrack.close();
-      break;
+      // must be at the end of the file
+      if (_loopPlayback) {
+        // play in loop
+        if (isMP3File(currentTrack.name())) {
+          currentTrack.seek(mp3_ID3Jumper(currentTrack));
+        } else {
+          currentTrack.seek(0);
+        }
+      } else {
+        // wrap it up!
+        playingMusic = false;
+        currentTrack.close();
+        break;
+      }
     }
 
     playData(mp3buffer, bytesread);
   }
+}
+
+// get current playback speed. 0 or 1 indicates normal speed
+uint16_t Adafruit_VS1053_FilePlayer::getPlaySpeed() {
+  noInterrupts();
+  sciWrite(VS1053_SCI_WRAMADDR, VS1053_PARA_PLAYSPEED);
+  uint16_t speed = sciRead(VS1053_SCI_WRAM);
+  interrupts();
+  return speed;
+}
+
+// set playback speed: 0 or 1 for normal speed, 2 for 2x, 3 for 3x, etc.
+void Adafruit_VS1053_FilePlayer::setPlaySpeed(uint16_t speed) {
+  noInterrupts();
+  sciWrite(VS1053_SCI_WRAMADDR, VS1053_PARA_PLAYSPEED);
+  sciWrite(VS1053_SCI_WRAM, speed);
+  interrupts();
 }
 
 /***************************************************************/
