@@ -256,6 +256,16 @@ public:
    */
   void stopRecordOgg(void);
   /*!
+   * @brief Start recording
+   * @param mic mic=true for microphone input
+   * @param samplerate sample rate in hz (8000 - 48000)
+   */
+  void startRecordWav(boolean mic, uint16_t samplerate);
+  /*!
+   * @brief Stop the recording
+   */
+  void stopRecordWav(void);
+  /*!
    * @brief Returns the number of words recorded
    * @return 2-byte unsigned int with the number of words
    */
