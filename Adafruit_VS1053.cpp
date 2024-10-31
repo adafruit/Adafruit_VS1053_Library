@@ -306,7 +306,7 @@ void Adafruit_VS1053_FilePlayer::feedBuffer_noLock(void) {
     // Read some audio data from the SD card file
     int bytesread = currentTrack.read(mp3buffer, VS1053_DATABUFFERLEN);
 
-    if (bytesread == 0) {
+    if (bytesread <= 0) {
       // must be at the end of the file
       if (_loopPlayback) {
         // play in loop
