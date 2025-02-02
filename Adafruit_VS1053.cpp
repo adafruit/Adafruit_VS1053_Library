@@ -41,7 +41,7 @@ SIGNAL(TIMER0_COMPA_vect) { myself->feedBuffer(); }
 
 volatile boolean feedBufferLock = false; //!< Locks feeding the buffer
 boolean _loopPlayback; //!< internal variable, used to control playback looping
-boolean _fastStart; //!< If yes, do not close the file when done playing.
+boolean _fastStart;    //!< If yes, do not close the file when done playing.
 
 #if defined(ESP8266)
 ICACHE_RAM_ATTR
