@@ -369,6 +369,13 @@ public:
    */
   boolean startPlayingFile(const char *trackname);
   /*!
+   * @brief Enqueue the file for playing. This function returns with playback
+   *        paused.
+   * @param *trackname File to play
+   * @return Returns true when file starts playing
+   */
+  boolean prepareFullFile(const char *trackname);
+  /*!
    * @brief Play the complete file. This function will not return until the
    * playback is complete
    * @param *trackname File to play
@@ -391,6 +398,10 @@ public:
    * @param pause whether or not to pause playback
    */
   void pausePlaying(boolean pause);
+  /*!
+   * @brief Rewinds playback to the beginning.
+   */
+  void rewind(void);
   /*!
    * @brief Set state for playback looping
    * @param loopState Sets playback loop state (Note: Only use with
@@ -416,6 +427,8 @@ public:
 
 private:
   void feedBuffer_noLock(void);
+  boolean playFullFile(const char *trackname, bool startImmediately);
+  boolean startPlayingFile(const char *trackname, bool startImmediately);
 
   uint8_t _cardCS;
 };

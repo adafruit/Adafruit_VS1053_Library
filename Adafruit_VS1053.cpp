@@ -41,6 +41,7 @@ SIGNAL(TIMER0_COMPA_vect) { myself->feedBuffer(); }
 
 volatile boolean feedBufferLock = false; //!< Locks feeding the buffer
 boolean _loopPlayback; //!< internal variable, used to control playback looping
+boolean _fastStart;
 
 #if defined(ESP8266)
 ICACHE_RAM_ATTR
@@ -140,8 +141,17 @@ boolean Adafruit_VS1053_FilePlayer::begin(void) {
   return (v == 4);
 }
 
+boolean Adafruit_VS1053_FilePlayer::prepareFullFile(const char *trackname) {
+  playFullFile(trackname, false);
+}
+
 boolean Adafruit_VS1053_FilePlayer::playFullFile(const char *trackname) {
-  if (!startPlayingFile(trackname))
+  playFullFile(trackname, true);
+}
+
+boolean Adafruit_VS1053_FilePlayer::playFullFile(const char *trackname, bool startImmediately) {
+  _fastStart = !startImmediately;
+  if (!startPlayingFile(trackname, startImmediately))
     return false;
 
   while (playingMusic) {
@@ -161,6 +171,15 @@ void Adafruit_VS1053_FilePlayer::stopPlaying(void) {
   // wrap it up!
   playingMusic = false;
   currentTrack.close();
+}
+
+void Adafruit_VS1053_FilePlayer::rewind(void) {
+  // play in loop or prepare to play in loop
+  if (isMP3File(currentTrack.name())) {
+    currentTrack.seek(mp3_ID3Jumper(currentTrack));
+  } else {
+    currentTrack.seek(0);
+  }
 }
 
 void Adafruit_VS1053_FilePlayer::pausePlaying(boolean pause) {
@@ -230,6 +249,10 @@ unsigned long Adafruit_VS1053_FilePlayer::mp3_ID3Jumper(File mp3) {
 }
 
 boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
+  startPlayingFile(trackname, true);
+}
+
+boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname, bool startImmediately) {
   // reset playback
   sciWrite(VS1053_REG_MODE, VS1053_MODE_SM_LINE1 | VS1053_MODE_SM_SDINEW |
                                 VS1053_MODE_SM_LAYER12);
@@ -241,7 +264,6 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   if (!currentTrack) {
     return false;
   }
-
   // We know we have a valid file. Check if .mp3
   // If so, check for ID3 tag and jump it if present.
   if (isMP3File(trackname)) {
@@ -256,7 +278,9 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   sciWrite(VS1053_REG_DECODETIME, 0x00);
   sciWrite(VS1053_REG_DECODETIME, 0x00);
 
-  playingMusic = true;
+  if (startImmediately) {
+    playingMusic = true;
+  }
 
   // wait till its ready for data
   while (!readyForData()) {
@@ -308,17 +332,16 @@ void Adafruit_VS1053_FilePlayer::feedBuffer_noLock(void) {
 
     if (bytesread == 0) {
       // must be at the end of the file
-      if (_loopPlayback) {
-        // play in loop
-        if (isMP3File(currentTrack.name())) {
-          currentTrack.seek(mp3_ID3Jumper(currentTrack));
-        } else {
-          currentTrack.seek(0);
-        }
+      if (_loopPlayback || _fastStart) {
+        if (_fastStart) playingMusic = false;
+
+        rewind();
       } else {
         // wrap it up!
         playingMusic = false;
-        currentTrack.close();
+        if (!_fastStart) {
+          currentTrack.close();
+        }
         break;
       }
     }
