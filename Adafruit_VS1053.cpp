@@ -142,11 +142,11 @@ boolean Adafruit_VS1053_FilePlayer::begin(void) {
 }
 
 boolean Adafruit_VS1053_FilePlayer::prepareFullFile(const char *trackname) {
-  playFullFile(trackname, false);
+  return playFullFile(trackname, false);
 }
 
 boolean Adafruit_VS1053_FilePlayer::playFullFile(const char *trackname) {
-  playFullFile(trackname, true);
+  return playFullFile(trackname, true);
 }
 
 boolean Adafruit_VS1053_FilePlayer::playFullFile(const char *trackname, bool startImmediately) {
@@ -249,7 +249,7 @@ unsigned long Adafruit_VS1053_FilePlayer::mp3_ID3Jumper(File mp3) {
 }
 
 boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
-  startPlayingFile(trackname, true);
+  return startPlayingFile(trackname, true);
 }
 
 boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname, bool startImmediately) {
