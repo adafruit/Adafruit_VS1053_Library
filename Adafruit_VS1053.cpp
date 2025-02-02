@@ -149,7 +149,8 @@ boolean Adafruit_VS1053_FilePlayer::playFullFile(const char *trackname) {
   return playFullFile(trackname, true);
 }
 
-boolean Adafruit_VS1053_FilePlayer::playFullFile(const char *trackname, bool startImmediately) {
+boolean Adafruit_VS1053_FilePlayer::playFullFile(const char *trackname,
+                                                 bool startImmediately) {
   _fastStart = !startImmediately;
   if (!startPlayingFile(trackname, startImmediately))
     return false;
@@ -252,7 +253,8 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   return startPlayingFile(trackname, true);
 }
 
-boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname, bool startImmediately) {
+boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname,
+                                                     bool startImmediately) {
   // reset playback
   sciWrite(VS1053_REG_MODE, VS1053_MODE_SM_LINE1 | VS1053_MODE_SM_SDINEW |
                                 VS1053_MODE_SM_LAYER12);
@@ -333,7 +335,9 @@ void Adafruit_VS1053_FilePlayer::feedBuffer_noLock(void) {
     if (bytesread == 0) {
       // must be at the end of the file
       if (_loopPlayback || _fastStart) {
-        if (_fastStart) playingMusic = false;
+        if (_fastStart) {
+          playingMusic = false;
+        }
 
         rewind();
       } else {
