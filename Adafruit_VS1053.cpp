@@ -246,7 +246,6 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
     return false;
   }
 
-
   // We know we have a valid file. Check if .mp3
   // If so, check for ID3 tag and jump it if present.
   if (isMP3File(trackname)) {
@@ -254,7 +253,8 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   }
 
   // don't let the IRQ get triggered by accident here
-  if (usingInterrupts) noInterrupts();
+  if (usingInterrupts)
+    noInterrupts();
 
   // As explained in datasheet, set twice 0 in REG_DECODETIME to set time back
   // to 0
@@ -283,7 +283,8 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
 }
 
 void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
-  if (usingInterrupts) noInterrupts();
+  if (usingInterrupts)
+    noInterrupts();
   // dont run twice in case interrupts collided
   // This isn't a perfect lock as it may lose one feedBuffer request if
   // an interrupt occurs before feedBufferLock is reset to false. This
@@ -335,7 +336,8 @@ void Adafruit_VS1053_FilePlayer::feedBuffer_noLock(void) {
 
 // get current playback speed. 0 or 1 indicates normal speed
 uint16_t Adafruit_VS1053_FilePlayer::getPlaySpeed() {
-  if (usingInterrupts) noInterrupts();
+  if (usingInterrupts)
+    noInterrupts();
   sciWrite(VS1053_SCI_WRAMADDR, VS1053_PARA_PLAYSPEED);
   uint16_t speed = sciRead(VS1053_SCI_WRAM);
   interrupts();
@@ -344,7 +346,8 @@ uint16_t Adafruit_VS1053_FilePlayer::getPlaySpeed() {
 
 // set playback speed: 0 or 1 for normal speed, 2 for 2x, 3 for 3x, etc.
 void Adafruit_VS1053_FilePlayer::setPlaySpeed(uint16_t speed) {
-  if (usingInterrupts) noInterrupts();
+  if (usingInterrupts)
+    noInterrupts();
   sciWrite(VS1053_SCI_WRAMADDR, VS1053_PARA_PLAYSPEED);
   sciWrite(VS1053_SCI_WRAM, speed);
   interrupts();
@@ -480,7 +483,8 @@ void Adafruit_VS1053::setVolume(uint8_t left, uint8_t right) {
   v <<= 8;
   v |= right;
 
-  if (usingInterrupts) noInterrupts(); // cli();
+  if (usingInterrupts)
+    noInterrupts(); // cli();
 
   sciWrite(VS1053_REG_VOLUME, v);
 
@@ -488,7 +492,8 @@ void Adafruit_VS1053::setVolume(uint8_t left, uint8_t right) {
 }
 
 uint16_t Adafruit_VS1053::decodeTime() {
-  if (usingInterrupts) noInterrupts();
+  if (usingInterrupts)
+    noInterrupts();
   uint16_t t = sciRead(VS1053_REG_DECODETIME);
   interrupts(); // sei();
   return t;
