@@ -50,6 +50,8 @@ static void feeder(void) { myself->feedBuffer(); }
 boolean Adafruit_VS1053_FilePlayer::useInterrupt(uint8_t type) {
   myself = this; // oy vey
 
+  usingInterrupts = true;
+
   if (type == VS1053_FILEPLAYER_TIMER0_INT) {
 #if defined(ARDUINO_ARCH_AVR)
     OCR0A = 0xAF;
@@ -78,6 +80,7 @@ boolean Adafruit_VS1053_FilePlayer::useInterrupt(uint8_t type) {
     timer.resume();
 
 #else
+    usingInterrupts = false;
     return false;
 #endif
   }
@@ -93,6 +96,7 @@ boolean Adafruit_VS1053_FilePlayer::useInterrupt(uint8_t type) {
     attachInterrupt(irq, feeder, CHANGE);
     return true;
   }
+  usingInterrupts = false;
   return false;
 }
 
@@ -242,6 +246,7 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
     return false;
   }
 
+
   // We know we have a valid file. Check if .mp3
   // If so, check for ID3 tag and jump it if present.
   if (isMP3File(trackname)) {
@@ -249,7 +254,7 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
   }
 
   // don't let the IRQ get triggered by accident here
-  noInterrupts();
+  if (usingInterrupts) noInterrupts();
 
   // As explained in datasheet, set twice 0 in REG_DECODETIME to set time back
   // to 0
@@ -260,6 +265,7 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
 
   // wait till its ready for data
   while (!readyForData()) {
+    delay(1);
 #if defined(ESP8266)
     ESP.wdtFeed();
 #endif
@@ -277,7 +283,7 @@ boolean Adafruit_VS1053_FilePlayer::startPlayingFile(const char *trackname) {
 }
 
 void Adafruit_VS1053_FilePlayer::feedBuffer(void) {
-  noInterrupts();
+  if (usingInterrupts) noInterrupts();
   // dont run twice in case interrupts collided
   // This isn't a perfect lock as it may lose one feedBuffer request if
   // an interrupt occurs before feedBufferLock is reset to false. This
@@ -329,7 +335,7 @@ void Adafruit_VS1053_FilePlayer::feedBuffer_noLock(void) {
 
 // get current playback speed. 0 or 1 indicates normal speed
 uint16_t Adafruit_VS1053_FilePlayer::getPlaySpeed() {
-  noInterrupts();
+  if (usingInterrupts) noInterrupts();
   sciWrite(VS1053_SCI_WRAMADDR, VS1053_PARA_PLAYSPEED);
   uint16_t speed = sciRead(VS1053_SCI_WRAM);
   interrupts();
@@ -338,7 +344,7 @@ uint16_t Adafruit_VS1053_FilePlayer::getPlaySpeed() {
 
 // set playback speed: 0 or 1 for normal speed, 2 for 2x, 3 for 3x, etc.
 void Adafruit_VS1053_FilePlayer::setPlaySpeed(uint16_t speed) {
-  noInterrupts();
+  if (usingInterrupts) noInterrupts();
   sciWrite(VS1053_SCI_WRAMADDR, VS1053_PARA_PLAYSPEED);
   sciWrite(VS1053_SCI_WRAM, speed);
   interrupts();
@@ -347,8 +353,6 @@ void Adafruit_VS1053_FilePlayer::setPlaySpeed(uint16_t speed) {
 /***************************************************************/
 
 /* VS1053 'low level' interface */
-static volatile PortReg *clkportreg, *misoportreg, *mosiportreg;
-static PortMask clkpin, misopin, mosipin;
 
 Adafruit_VS1053::Adafruit_VS1053(int8_t mosi, int8_t miso, int8_t clk,
                                  int8_t rst, int8_t cs, int8_t dcs,
@@ -362,13 +366,6 @@ Adafruit_VS1053::Adafruit_VS1053(int8_t mosi, int8_t miso, int8_t clk,
   _dreq = dreq;
 
   useHardwareSPI = false;
-
-  clkportreg = portOutputRegister(digitalPinToPort(_clk));
-  clkpin = digitalPinToBitMask(_clk);
-  misoportreg = portInputRegister(digitalPinToPort(_miso));
-  misopin = digitalPinToBitMask(_miso);
-  mosiportreg = portOutputRegister(digitalPinToPort(_mosi));
-  mosipin = digitalPinToBitMask(_mosi);
 }
 
 Adafruit_VS1053::Adafruit_VS1053(int8_t rst, int8_t cs, int8_t dcs,
@@ -483,13 +480,15 @@ void Adafruit_VS1053::setVolume(uint8_t left, uint8_t right) {
   v <<= 8;
   v |= right;
 
-  noInterrupts(); // cli();
+  if (usingInterrupts) noInterrupts(); // cli();
+
   sciWrite(VS1053_REG_VOLUME, v);
+
   interrupts(); // sei();
 }
 
 uint16_t Adafruit_VS1053::decodeTime() {
-  noInterrupts(); // cli();
+  if (usingInterrupts) noInterrupts();
   uint16_t t = sciRead(VS1053_REG_DECODETIME);
   interrupts(); // sei();
   return t;

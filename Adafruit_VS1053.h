@@ -281,6 +281,7 @@ private:
 #else
 protected:
   uint8_t _dreq; //!< Data request pin
+  boolean usingInterrupts = false;
 private:
   Adafruit_SPIDevice *spi_dev_ctrl = NULL; ///< Pointer to SPI dev for control
   Adafruit_SPIDevice *spi_dev_data = NULL; ///< Pointer to SPI dev for data
