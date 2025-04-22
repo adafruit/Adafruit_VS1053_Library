@@ -271,7 +271,8 @@ public:
 
 #ifdef ARDUINO_ARCH_SAMD
 protected:
-  uint32_t _dreq;
+  uint32_t _dreq;                  //!< Data request pin
+  boolean usingInterrupts = false; //!< True if using interrupts
 
 private:
   Adafruit_SPIDevice *spi_dev_ctrl = NULL; ///< Pointer to SPI dev for control
@@ -280,7 +281,9 @@ private:
   boolean useHardwareSPI;
 #else
 protected:
-  uint8_t _dreq; //!< Data request pin
+  uint8_t _dreq;                   //!< Data request pin
+  boolean usingInterrupts = false; //!< True if using interrupts
+
 private:
   Adafruit_SPIDevice *spi_dev_ctrl = NULL; ///< Pointer to SPI dev for control
   Adafruit_SPIDevice *spi_dev_data = NULL; ///< Pointer to SPI dev for data
