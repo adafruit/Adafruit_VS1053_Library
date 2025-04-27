@@ -19,9 +19,14 @@
 
 #include <Adafruit_SPIDevice.h>
 
-#if defined(PREFER_SDFAT_LIBRARY)
+#if defined(PREFER_SDFAT_LIBRARY) || defined(USE_SDFAT_FAT32)
 #include <SdFat.h>
+#if defined(USE_SDFAT_FAT32)
+extern SdFat32 SD;
+typedef File32 File;
+#else
 extern SdFat SD;
+#endif
 #else
 #include <SD.h>
 #endif
