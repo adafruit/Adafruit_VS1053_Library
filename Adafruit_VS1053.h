@@ -12,7 +12,8 @@
 #include <pins_arduino.h>
 #endif
 
-#if !defined(ARDUINO_STM32_FEATHER)
+#if !defined(ARDUINO_STM32_FEATHER) && !defined(ARDUINO_UNOR4_WIFI) &&         \
+    !defined(ARDUINO_UNOR4_MINIMA)
 #include "pins_arduino.h"
 #include "wiring_private.h"
 #endif
