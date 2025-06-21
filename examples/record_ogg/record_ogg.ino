@@ -154,6 +154,7 @@ uint16_t saveRecordedData(boolean isrecord) {
       uint16_t t = musicPlayer.recordedReadWord();
       recording_buffer[addr] = t >> 8; 
       recording_buffer[addr+1] = t;
+      addr += 2;
       if (addr > RECBUFFSIZE) {
           if (! recording.write(recording_buffer, RECBUFFSIZE)) {
                 Serial.println("Couldn't write!");
