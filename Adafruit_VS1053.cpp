@@ -477,7 +477,10 @@ void Adafruit_VS1053::playData(uint8_t *buffer, uint8_t buffsiz) {
 }
 
 void Adafruit_VS1053::setVolume(uint8_t left, uint8_t right) {
-  // accepts values between 0 and 255 for left and right.
+  // Set volume for left, right channels. 
+  // Volume range: 0–127 practical (-0.5 dB per step; lower = louder)
+  // 0 = max volume, ~20 = loud default, 127 = very quiet
+  // 255 = MUTE (analog power-down), values >127 are effectively inaudible
   uint16_t v;
   v = left;
   v <<= 8;

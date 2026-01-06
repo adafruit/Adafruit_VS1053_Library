@@ -62,7 +62,10 @@ void setup() {
   // list files
   printDirectory(SD.open("/"), 0);
   
-  // Set volume for left, right channels. lower numbers == louder volume!
+  // Set volume for left, right channels. 
+  // Volume range: 0–127 practical (-0.5 dB per step; lower = louder)
+  // 0 = max volume, ~20 = loud default, 127 = very quiet
+  // 255 = MUTE (analog power-down), values >127 are effectively inaudible
   musicPlayer.setVolume(20,20);
 
   // Timer interrupts are not suggested, better to use DREQ interrupt!
